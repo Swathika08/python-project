@@ -1,0 +1,4116 @@
+﻿from tkinter import *
+from tkinter import messagebox
+from tkinter import ttk 
+import mysql.connector as sql
+import random,datetime,webbrowser
+from PIL import Image
+mycon=sql.connect(host="localhost",user="root",password="####")
+if mycon.is_connected()==False:
+    print("connection not success")
+else:
+    print("connection sucess")
+#cur.execute("create database bus")
+mycon=sql.connect(host="localhost",user="root",password="####",database="bus")
+cur=mycon.cursor()
+#cur.execute("create table busdetail(busno integer primary key,driver varchar(20),type1 varchar(10),type2 varchar(10),mode varchar(10),froloc varchar(15),toloc varchar(15),timing char(10),costpp integer,seats integer)")
+#cur.execute("create table passenger(busno integer primary key,5 name varchar(20),age integer,gender varchar(10))")
+#cur.execute("create table admin(username varchar(20) primary key,password varchar(20))")
+#cur.execute("create table user(username varchar(20) primary key,password varchar(20),email varchar(20),aadhar integer)")
+#cur.execute("insert into admin values('*****','####')")
+zl=0
+tl=0
+ts=0
+t=0
+al=0
+bl=0
+cl=0
+dl=0
+rl=0
+sl=1
+tl=0
+kl=0
+ml=0
+nl=0
+rl=0
+ol=0
+si=[]
+sj=[]
+sk=[]
+sl=[]
+ma=[]
+n=[]
+for i in range(100):
+    ak=random.randint(10000,1000000)
+    si.append(ak)
+for i in si:
+    if si.count(i)==1:
+        sj.append(i)
+
+
+def admin_login():
+    global ad,username,password
+    ad=Tk()
+    ad.title("Admin")
+    ad.geometry("1400x1050")
+    photo = PhotoImage(file=r"E:\cs proj\bg5.1.png")
+    a=Label(image=photo)
+    a.image=(photo)
+    a.pack()
+    username = StringVar()
+    password = StringVar()
+    Label(ad, text="Please enter details below",bg="papaya whip",fg="midnight blue",font=("Comic Sans MS",22,"bold")).place(x=500,y=30)
+    username_label=Label(ad, text="Username * ",width=10,bg="papaya whip",fg="midnight blue",font=("Comic Sans MS",20,"bold")).place(x=300,y=100)
+    username_entry= Entry(ad, textvariable=username,bg="misty rose",fg="midnight blue",font=("Comic Sans MS",18,"bold")).place(x=500,y=97)
+    password_label=Label(ad, text="Password * ",width=10,bg="papaya whip",fg="midnight blue",font=("Comic Sans MS",20,"bold")).place(x=300,y=170)
+    password_entry= Entry(ad, textvariable=password, show='*',bg="misty rose",fg="midnight blue",font=("Comic Sans MS",18,"bold")).place(x=500,y=177)
+    Button(ad,width=8,height=1,text="Proceed",bg="papaya whip",fg="midnight blue",font=("Comic Sans MS",20,"bold"),command=admin_loginproceed,relief=GROOVE,bd=6,activebackground="powderblue",activeforeground="royal blue").place(x=650,y=230)
+    Button(ad,width=8,height=1,text="Back",bg="papaya whip",fg="midnight blue",font=("Comic Sans MS",20,"bold"),command=admin2,relief=GROOVE,bd=6,activebackground="powderblue",activeforeground="royal blue").place(x=450,y=230)
+
+
+def admin2():
+    ad.destroy()
+    main()
+
+
+def admin_loginproceed():
+    a=username.get()
+    b=password.get()
+    cur.execute("select username,password from admin")
+    da=cur.fetchall()
+    if a=='' or b=='':
+        messagebox.showerror("Error","Enter all values")
+    if da[0][0]==a and da[0][1]==b:
+        messagebox.showinfo("Info","Login Successfull")
+        ad.destroy()
+        admin_mainscreen()
+    elif da[0][0]!=a or da[0][1]!=b:
+        messagebox.showwarning("Warning","Incorrect Username or Password")
+
+
+
+
+def admin_mainscreen():
+    global am
+    am=Tk()
+    am.title("mainscreen")
+    am.geometry("1400x1050")
+    photo = PhotoImage(file=r"E:\cs proj\ad2.png")
+    a=Label(image=photo)
+    a.image=(photo)
+    a.pack()
+    frame=Frame(am).pack()
+    menu=Menu(frame,bg="RoyalBlue3")
+    am.config(menu=menu)
+    file=Menu(menu,activebackground="royal blue",activeforeground="PaleTurquoise1",font=("Comic Sans MS",16,"bold"))
+    menu.add_cascade(label="File",menu=file,activebackground="royal blue",activeforeground="PaleTurquoise1",font=("Comic Sans MS",16,"bold"))
+    file.add_command(label="Go to Mainscreen",command=desp,activebackground="royal blue",activeforeground="PaleTurquoise1",font=("Comic Sans MS",16,"bold"))
+    file.add_separator()
+    Button(am,width=15,height=1,text="Add Bus",bg="khaki",fg="black",font=("Comic Sans MS",17,"bold"),relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",command=admin_busdetails).place(x=50,y=350)
+    Button(am,width=15,height=1,text="Modify Bus",bg="lightgoldenrod1",fg="black",font=("Comic Sans MS",17,"bold"),relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",command=admo).place(x=300,y=350)
+    Button(am,width=15,height=1,text="Remove Bus",bg="gold",fg="black",font=("Comic Sans MS",17,"bold"),relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",command=admin_remove).place(x=550,y=350)
+    Button(am,width=15,height=1,text="Report",bg="goldenrod1",fg="black",font=("Comic Sans MS",17,"bold"),relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",command=adrep).place(x=800,y=350)    
+    Button(am,width=15,height=1,text="Show Buses",bg="goldenrod1",fg="black",font=("Comic Sans MS",17,"bold"),relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",command=admin_showbus).place(x=1050,y=350)
+    Button(am,width=15,height=1,text="Add place",bg="goldenrod1",fg="black",font=("Comic Sans MS",17,"bold"),relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",command=addpla1).place(x=400,y=450)
+    Button(am,width=15,height=1,text="Remove place ",bg="goldenrod",fg="black",font=("Comic Sans MS",17,"bold"),relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",command=rempla1).place(x=700,y=450)
+    Button(am,width=15,height=1,text="Show places ",bg="goldenrod",fg="black",font=("Comic Sans MS",17,"bold"),relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",command=shpla1).place(x=1000,y=450)
+    Button(am,width=15,height=1,text="Admin Controls ",bg="goldenrod",fg="black",font=("Comic Sans MS",17,"bold"),relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",command=admin_co1).place(x=100,y=450)
+
+
+
+
+def admin_co1():
+    global ol
+    if ol==0:
+        am.destroy()
+    admin_con1()
+
+
+def admin_co2():
+    global ol
+    if ol==0:
+        admn1.destroy()
+    admin_mainscreen()
+
+
+def admin_con1():
+    global admn1,userre,emailre
+    admn1=Tk()
+    admn1.geometry("1400x1200")
+    admn1.title('Admin Control 1')
+    canvas = Canvas(admn1)
+    scroll_y = Scrollbar(admn1, orient="vertical",command=canvas.yview)
+    frame = Frame(canvas)
+    ph=PhotoImage(file=r"E:\cs proj\bg9.1.png")
+    la=Label(frame,image=ph)
+    la.image=ph
+    la.pack()
+    userre=StringVar()
+    emailre=StringVar()
+    cur.execute("select * from user")
+    a=cur.fetchall()
+    b=cur.rowcount
+    mycon.commit()
+    c=100
+    Label(frame,text="Username",font=("Comic Sans MS",20,"bold"),bg="lavender blush",fg="coral").place(x=20,y=30)
+    Label(frame,text="Password",font=("Comic Sans MS",20,"bold"),bg="lavender blush",fg="coral").place(x=180,y=30)
+    Label(frame,text="Email Id",font=("Comic Sans MS",20,"bold"),bg="lavender blush",fg="coral").place(x=550,y=30)
+    Label(frame,text="Aadhar No",font=("Comic Sans MS",20,"bold"),bg="lavender blush",fg="coral").place(x=350,y=30)
+    for i in a:
+        Label(frame,text=i[0],font=("Comic Sans MS",16,"bold"),bg="lavender blush",fg="coral").place(x=20,y=c)
+        Label(frame,text=i[1],font=("Comic Sans MS",16,"bold"),bg="lavender blush",fg="coral").place(x=180,y=c)
+        Label(frame,text=i[2],font=("Comic Sans MS",16,"bold"),bg="lavender blush",fg="coral").place(x=550,y=c)
+        Label(frame,text=i[3],font=("Comic Sans MS",16,"bold"),bg="lavender blush",fg="coral").place(x=350,y=c)
+        c+=50
+    Label(frame,text="Enter username of user to remove \n(If any)",font=("Comic Sans MS",18,"bold"),bg="lavender blush",fg="coral").place(x=830,y=150)
+    Entry(frame,textvariable=userre,font=("Comic Sans MS",18,"bold"),bg="old lace",fg="SteelBlue1").place(x=840,y=260)
+    Label(frame,text="Enter email of user to remove \n(If any)",font=("Comic Sans MS",18,"bold"),bg="lavender blush",fg="coral").place(x=830,y=330)
+    Entry(frame,textvariable=emailre,font=("Comic Sans MS",18,"bold"),bg="old lace",fg="SteelBlue1").place(x=840,y=440)
+    Button(frame,text='OK',font=("Comic Sans MS",20,"bold"),relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="navy blue",bg="lavender blush",fg="coral",command=admin_co3).place(x=500,y=c+60)
+    Button(frame,text='Back',font=("Comic Sans MS",20,"bold"),relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="navy blue",bg="lavender blush",fg="coral",command=admin_co2).place(x=400,y=c+60)
+    Button(frame,text='View bus wise report',font=("Comic Sans MS",18,"bold"),relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="navy blue",bg="lavender blush",fg="coral",command=admin_co4).place(x=840,y=500)
+    canvas.create_window(0, 0, anchor='nw', window=frame)
+    canvas.update_idletasks()
+    canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
+    canvas.pack(fill='both', expand=True, side='left')
+    scroll_y.pack(fill='y', side='right')
+
+
+def admin_co3():
+    a=userre.get()
+    b=emailre.get()
+    if (a=='' and b!='') or (a!='' and b==''):
+        messagebox.showerror('Error','Enter both username & email')
+    elif a!='' or b!='':
+        cur.execute("delete from user where username='{}' and email='{}'".format(a,b))
+        mycon.commit()
+        messagebox.showinfo('Info','User removed successfully')
+        admn1.destroy()
+        admin_mainscreen()
+    else:
+        admn1.destroy()
+        admin_mainscreen()
+
+
+def admin_co4():
+    global ol
+    if ol==0:
+        admn1.destroy()
+    admin_con2()
+
+
+def admin_con2():
+    global admn2,busview
+    admn2=Tk()
+    admn2.geometry('1400x1200')
+    admn2.title('Admin Control 2')
+    ph=PhotoImage(file=r"E:\cs proj\bg9.1.png")
+    la=Label(admn2,image=ph)
+    la.image=ph
+    la.pack()
+    busview=StringVar()
+    Label(admn2,text='Select bus no to view report',font=("Comic Sans MS",18,"bold"),bg="lavender blush",fg="coral").place(x=450,y=50)
+    cur.execute('select busno from busdetail')
+    a=cur.fetchall()
+    mycon.commit()
+    b=ttk.Combobox(admn2,textvariable=busview,width=15,values=a,font=("Comic Sans MS",18,"bold"))
+    b.current(0)
+    b.place(x=500,y=150)
+    Button(admn2,text='BACK',font=("Comic Sans MS",20,"bold"),relief=GROOVE,bd=6,activebackground="peach puff",activeforeground="navy blue",bg="lavender blush",fg="coral",command=admin_co5).place(x=400,y=270)
+    Button(admn2,text='OK',font=("Comic Sans MS",20,"bold"),relief=GROOVE,bd=6,activebackground="peach puff",activeforeground="navy blue",bg="lavender blush",fg="coral",command=admin_co61).place(x=600,y=270)
+
+
+def admin_co5():
+    global ol
+    if ol==0:
+        admn2.destroy()
+    admin_con1()
+
+
+def admin_co61():
+    global ol
+    if ol==0:
+        admn2.destroy()
+    admin_con3()
+
+
+def admin_co6():
+    a=busview.get()
+    cur.execute("select distinct(busno) from trips")
+    q=cur.fetchall()
+    mycon.commit()
+    q11=[i[0] for i in q]
+    print(a,q11,q)
+    if str(a) in q11:
+            admn2.destroy()
+            admin_con3()
+    else:
+        messagebox.showerror('Error','No trips found')
+
+
+def admin_con3():
+    global admn3,emailview,bookview
+    admn3=Tk()
+    admn3.geometry('1400x2000')
+    admn3.title('Admin Control 3')
+    emailview=StringVar()
+    bookview=IntVar()
+    canvas = Canvas(admn3)
+    scroll_y = Scrollbar(admn3, orient="vertical",command=canvas.yview)
+    frame = Frame(canvas)
+    ph=PhotoImage(file=r"E:\cs proj\bg43.1.png")
+    la=Label(frame,image=ph)
+    la.image=ph
+    la.pack()
+    a=busview.get()
+    cur.execute("select distinct(email) from trips where busno={}".format(a))
+    b=cur.fetchall()
+    mycon.commit()
+    f=30
+    for i in b:
+        cur.execute("select username from user where email='{}'".format(i[0]))
+        c=cur.fetchall()
+        mycon.commit()
+        d=c[0][0]+"\t\t"+i[0]
+        Label(frame,text=c[0][0],font=("Comic Sans MS",18,"bold"),bg="lavender blush",fg="coral").place(x=40,y=f)
+        Label(frame,text=i[0],font=("Comic Sans MS",18,"bold"),bg="lavender blush",fg="coral").place(x=140,y=f)
+        cur.execute("select trdate,nop,status,bookno from trips where email='{}' and busno={}".format(i[0],a))
+        e=cur.fetchall()
+        mycon.commit()
+        Label(frame,text="Trip date",font=("Comic Sans MS",16,"bold"),bg="lavender blush",fg="coral").place(x=40,y=f+50)
+        Label(frame,text="No of\nPassenger",font=("Comic Sans MS",16,"bold"),bg="lavender blush",fg="coral").place(x=180,y=f+50)
+        Label(frame,text="Status",font=("Comic Sans MS",16,"bold"),bg="lavender blush",fg="coral").place(x=320,y=f+50)
+        Label(frame,text="Booking ID",font=("Comic Sans MS",16,"bold"),bg="lavender blush",fg="coral").place(x=460,y=f+50)
+        for j in e:
+            Label(frame,text=j[0],font=("Comic Sans MS",16,"bold"),bg="lavender blush",fg="coral").place(x=40,y=f+110)
+            Label(frame,text=j[1],font=("Comic Sans MS",16,"bold"),bg="lavender blush",fg="coral").place(x=210,y=f+110)
+            Label(frame,text=j[2],font=("Comic Sans MS",16,"bold"),bg="lavender blush",fg="coral").place(x=340,y=f+110)
+            Label(frame,text=j[3],font=("Comic Sans MS",16,"bold"),bg="lavender blush",fg="coral").place(x=460,y=f+110)
+            f+=60
+        f+=130
+    Label(frame,text="Enter email of user to view",font=("Comic Sans MS",18,"bold"),bg="lavender blush",fg="coral").place(x=830,y=150)
+    Entry(frame,textvariable=emailview,font=("Comic Sans MS",18,"bold"),bg="old lace",fg="SteelBlue1").place(x=840,y=210)
+    Label(frame,text="Enter Booking ID of trip to view",font=("Comic Sans MS",18,"bold"),bg="lavender blush",fg="coral").place(x=830,y=300)
+    Entry(frame,textvariable=bookview,font=("Comic Sans MS",18,"bold"),bg="old lace",fg="SteelBlue1").place(x=840,y=360)
+    Button(frame,text='Back',font=("Comic Sans MS",20,"bold"),bg="lavender blush",fg="coral",relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="Indian red",command=admin_co7).place(x=500,y=f+60)
+    Button(frame,text='OK',font=("Comic Sans MS",20,"bold"),bg="lavender blush",fg="coral",relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="Indian red",command=admin_co8).place(x=600,y=f+60)
+    canvas.create_window(0, 0, anchor='nw', window=frame)
+    canvas.update_idletasks()
+    canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
+    canvas.pack(fill='both', expand=True, side='left')
+    scroll_y.pack(fill='y', side='right')
+
+
+def admin_co7():
+    global ol
+    if ol==0:
+        admn3.destroy()
+    admin_con2()
+
+
+def admin_co8():
+    a=emailview.get()
+    b=bookview.get()
+    if (a=='' and b!=0) or (a!='' and b==0):
+        messagebox.showerror('Error','Enter both email & Booking Id')
+    elif a!='' or b!=0:
+        global admn4
+        admn3.destroy()
+        admn4=Tk()
+        admn4.geometry('1400x1200')
+        admn4.title('Admin Control 4')
+        ph=PhotoImage(file=r"E:\cs proj\bg43.1.png")
+        la=Label(image=ph)
+        la.image=ph
+        la.pack()
+        cur.execute("select name,age,seatno from passenger where id={}".format(b))
+        c=cur.fetchall()
+        mycon.commit()
+        Label(admn4,text='Name',font=("Comic Sans MS",18,"bold"),bg="lavender blush",fg="coral").place(x=40,y=30)
+        Label(admn4,text='Age',font=("Comic Sans MS",18,"bold"),bg="lavender blush",fg="coral").place(x=150,y=30)
+        Label(admn4,text='Seat no',font=("Comic Sans MS",18,"bold"),bg="lavender blush",fg="coral").place(x=210,y=30)
+        d=90
+        for i in c:
+            Label(admn4,text=i[0],font=("Comic Sans MS",16,"bold"),bg="lavender blush",fg="coral").place(x=40,y=d)
+            Label(admn4,text=i[1],font=("Comic Sans MS",16,"bold"),bg="lavender blush",fg="coral").place(x=150,y=d)
+            Label(admn4,text=i[2],font=("Comic Sans MS",16,"bold"),bg="lavender blush",fg="coral").place(x=210,y=d)
+            d+=40
+        Button(admn4,text='Back',font=("Comic Sans MS",20,"bold"),relief=GROOVE,bd=6,activebackground="lavender blush",activeforeground="SteelBlue1",bg="lavender blush",fg="coral",command=admin_co9).place(x=500,y=d+60)
+        Button(admn4,text='OK',font=("Comic Sans MS",20,"bold"),relief=GROOVE,bd=6,activebackground="lavender blush",activeforeground="SteelBlue1",bg="lavender blush",fg="coral",command=admin_co10).place(x=600,y=d+60)
+    else:
+        admn3.destroy()
+        admin_mainscreen()
+
+
+def admin_co9():
+    global ol
+    if ol==0:
+        admn4.destroy()
+    admin_con3()
+
+
+def admin_co10():
+    global ol
+    if ol==0:
+        admn4.destroy()
+    admin_mainscreen()
+
+
+def shpla1():
+    global ol
+    if ol==0:
+        am.destroy()
+    shpl1()
+
+
+def shpl1():
+    global shp1
+    shp1=Tk()
+    shp1.geometry("1400x3000")
+    shp1.title("Show Places")
+    canvas = Canvas(shp1)
+    scroll_y = Scrollbar(shp1, orient="vertical",command=canvas.yview)
+    frame = Frame(canvas)
+    ph=PhotoImage(file=r"E:\cs proj\bg32.1.png")
+    la=Label(frame,image=ph)
+    la.image=ph
+    la.pack()
+    cur.execute("select arriv,dept from places")
+    pl=cur.fetchall()
+    mycon.commit()
+    pl1,pl2=[],[]
+    for i in pl:
+        if i[0]!='NULL':
+            pl1.append(i[0])
+        if i[1]!='NULL':
+            pl2.append(i[1])
+    Label(frame,text="From Locations",font=("Comic Sans MS",20,"bold")).place(x=100,y=30)
+    a=80
+    for i in pl1:
+        Label(frame,text=i,font=("Comic Sans MS",15,"bold")).place(x=120,y=a)
+        a+=60
+    Label(frame,text="To Locations",font=("Comic Sans MS",20,"bold")).place(x=600,y=30)
+    b=80
+    for i in pl2:
+        Label(frame,text=i,font=("Comic Sans MS",15,"bold")).place(x=620,y=b)
+        b+=60
+    Button(frame,text='OK',font=("Comic Sans MS",20,"bold"),bg="light coral",fg="maroon",relief=GROOVE,bd=6,activebackground="light blue1",activeforeground="violet red",command=shpla2).place(x=500,y=a+50)
+    canvas.create_window(0, 0, anchor='nw', window=frame)
+    canvas.update_idletasks()
+    canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
+    canvas.pack(fill='both', expand=True, side='left')
+    scroll_y.pack(fill='y', side='right')
+
+
+def shpla2():
+    global ol
+    if ol==0:
+        shp1.destroy()
+    admin_mainscreen()
+
+
+def rempla1():
+    global ol
+    if ol==0:
+        am.destroy()
+    rempl1()
+
+
+def rempla2():
+    global ol
+    if ol==0:
+        repl1.destroy()
+    admin_mainscreen()
+
+
+def rempla3():
+    global ol
+    a=ch1.get()
+    if a==0:
+        messagebox.showerror('Error','Select a values')
+    else:
+        repl1.destroy()
+        rempl22()
+
+
+def rempl1():
+    global repl1,ch1
+    repl1=Tk()
+    repl1.geometry('1400x1050')
+    ph=PhotoImage(file=r"E:\cs proj\bg51.2.png")
+    la=Label(repl1,image=ph)
+    la.image=ph
+    la.pack()
+    repl1.title('Remove Place 1')
+    ch1=IntVar()
+    Label(repl1,text="Select your choice",bg="misty rose",fg="maroon",font=("Comic Sans MS",20,"bold")).place(x=350,y=50)
+    Radiobutton(repl1, bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",20,"bold"),activebackground="lemon chiffon",activeforeground="dark orange",text="From Location",value=1,variable=ch1).place(x=400,y=200)
+    Radiobutton(repl1,bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",20,"bold"),activebackground="lemon chiffon",activeforeground="dark orange",text="To Location",value=2,variable=ch1).place(x=400,y=300)
+    Button(repl1,text="OK",font=("Comic Sans MS",20,"bold"),relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",bg="misty rose",fg="maroon",command=rempla3).place(x=350,y=400)
+    Button(repl1,text="Back",font=("Comic Sans MS",20,"bold"),relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",bg="misty rose",fg="maroon",command=rempla2).place(x=450,y=400)
+
+
+def rempl22():
+    global repl2
+    repl2=Tk()
+    repl2.geometry('1400x1050')
+    ph=PhotoImage(file=r"E:\cs proj\bg50.1.png")
+    la=Label(repl2,image=ph)
+    la.image=ph
+    la.pack()
+    repl2.title('Remove Place 1')
+    global frm4,to4
+    a=ch1.get()
+    frm4=StringVar()
+    to4=StringVar()
+    cur.execute("select arriv,dept from places")
+    pl=cur.fetchall()
+    mycon.commit()
+    pl1,pl2=[],[]
+    for i in pl:
+        if i[0]!='NULL':
+            pl1.append(i[0])
+        if i[1]!='NULL':
+            pl2.append(i[1])
+    if a==1:
+        top=ttk.Combobox(repl2,textvariable=frm4,width=13,font=("Comic Sans MS",20,"bold"))
+        top['values']=pl1
+        top.place(x=350,y=120)
+        top.current(0)
+        Label(repl2,text="Select the From location you want to remove",bg="light coral",fg="maroon",font=("Comic Sans MS",20,"bold")).place(x=350,y=70)
+    else:
+        top=ttk.Combobox(repl2,textvariable=to4,width=13,font=("Comic Sans MS",20,"bold"))
+        top['values']=pl2
+        top.place(x=350,y=120)
+        top.current(0)
+        Label(repl2,text="Select the To location you want to remove",bg="light coral",fg="maroon",font=("Comic Sans MS",20,"bold")).place(x=350,y=70)
+    Button(repl2,text="OK",font=("Comic Sans MS",20,"bold"),bg="light blue",fg="blue4",relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",command=rempla4).place(x=350,y=200)
+    Button(repl2,text="Back",font=("Comic Sans MS",20,"bold"),bg="light blue",fg="blue4",relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",command=rempla5).place(x=450,y=200)
+
+
+def rempla4():
+    b=frm4.get()
+    c=to4.get()
+    if b=='' and c=='':
+        messagebox.showerror("Error","Enter the location")
+    else:
+        rempl2()
+def rempl2():
+    a=ch1.get()
+    b=frm4.get()
+    c=to4.get()
+    cur.execute("select * from places")
+    d=cur.fetchall()
+    e=cur.rowcount
+    mycon.commit()
+    f="NULL"
+    if a==1:
+        cur.execute("delete from places where arriv='{}' and dept='{}'" .format(b,f))
+        mycon.commit()
+    else:
+        cur.execute("delete from places where arriv='{}' and dept='{}'" .format(f,c))
+        mycon.commit()
+    messagebox.showinfo("Info","The Location has been Removed")
+    repl2.destroy()
+    admin_mainscreen()
+    
+def rempla5():
+    global ol
+    if ol==0:
+        repl2.destroy()
+    rempl1()    
+
+
+def addpla1():
+    global ol
+    if ol==0:
+        am.destroy()
+    addpl()
+
+
+def addpla2():
+    global ol
+    if ol==0:
+        adpl.destroy()
+    admin_mainscreen()
+
+
+def addpla3():
+    global ol
+    a=ch.get()
+    if a==0:
+        messagebox.showerror('Error','Select a values')
+    else:
+        adpl.destroy()
+        addpl1()
+
+
+def addpl():
+    global adpl,ch
+    adpl=Tk()
+    adpl.geometry('1400x1050')
+    adpl.title('Add Place 1')
+    photo = PhotoImage(file=r"E:\cs proj\bg22.1.png")
+    a=Label(image=photo)
+    a.image=(photo)
+    a.pack()
+    ch=IntVar()
+    Label(adpl,text="Select your choice",font=("Comic Sans MS",20,"bold")).place(x=350,y=50)
+    Radiobutton(adpl,bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",20,"bold"),activebackground="lemon chiffon",activeforeground="dark orange",text="From Location",value=1,variable=ch).place(x=400,y=200)
+    Radiobutton(adpl,bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",20,"bold"),activebackground="lemon chiffon",activeforeground="dark orange",text="To Location",value=2,variable=ch).place(x=400,y=300)
+    Button(adpl,text="OK",font=("Comic Sans MS",20,"bold"),bg="light blue",fg="deep pink",relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",command=addpla3).place(x=350,y=400)
+    Button(adpl,text="Back",font=("Comic Sans MS",20,"bold"),bg="light blue",fg="deep pink",relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",command=addpla2).place(x=450,y=400)
+
+
+def addpl1():
+    global adpl1,frm2,to2
+    adpl1=Tk()
+    adpl1.geometry('1400x1050')
+    adpl1.title('Add Place 1')
+    photo = PhotoImage(file=r"E:\cs proj\bg34.1.png")
+    a=Label(image=photo)
+    a.image=(photo)
+    a.pack()
+    a=ch.get()
+    frm2=StringVar()
+    to2=StringVar()
+    if a==1:
+        Label(adpl1,text="Enter the From location you want to add",font=("Comic Sans MS",20,"bold")).place(x=350,y=70)
+        Entry(adpl1,textvariable=frm2,font=("Comic Sans MS",20,"bold")).place(x=400,y=120)
+    else:
+        Label(adpl1,text="Enter the To location you want to add",font=("Comic Sans MS",20,"bold")).place(x=350,y=70)
+        Entry(adpl1,textvariable=to2,font=("Comic Sans MS",20,"bold")).place(x=400,y=120)
+    Button(adpl1,text="OK",font=("Comic Sans MS",20,"bold"),bg="Pale Turquoise1",fg="aquamarine4",relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",command=addpla4).place(x=350,y=200)
+    Button(adpl1,text="Back",font=("Comic Sans MS",20,"bold"),bg="Pale Turquoise1",fg="aquamarine4",relief=GROOVE,bd=6,activebackground="lemon chiffon",activeforeground="dark orange",command=addpla5).place(x=450,y=200)
+
+
+def addpla5():
+    global ol
+    if ol==0:
+        adpl1.destroy()
+    addpl()
+
+
+def addpla4():
+    a=frm2.get()
+    b=to2.get()
+    if a=='' and b=='':
+        messagebox.showerror("Error","Enter the location")
+    else:
+        addpl2()
+
+
+def addpl2():
+    a=ch.get()
+    b=frm2.get()
+    c=to2.get()
+    cur.execute("select max(sno) from places")
+    d=cur.fetchall()
+    e=d[0][0]
+    mycon.commit()
+    f="NULL"
+    cur.execute("select arriv from places where dept is not NULL")
+    g=cur.fetchall()
+    mycon.commit()
+    cur.execute("select dept from places where arriv is not NULL")
+    h=cur.fetchall()
+    mycon.commit()
+    g1=[i[0] for i in g]
+    h1=[i[0] for i in h]
+    if a==1:
+        if b in g1:
+            messagebox.showerror("Error","This Location already exists")
+        else:
+            cur.execute("insert into places values({},'{}','{}')".format(e+1,b,f))
+            mycon.commit()
+            messagebox.showinfo("Info","The Location has been added")
+            adpl1.destroy()
+            admin_mainscreen()
+    else:
+        if c in h1:
+           messagebox.showerror("Error","This Location already exists")
+        else:
+            cur.execute("insert into places values({},'{}','{}')".format(e+1,f,c))
+            mycon.commit()
+            messagebox.showinfo("Info","The Location has been added")
+            adpl1.destroy()
+            admin_mainscreen()
+
+
+def desp():
+    am.destroy()
+    main()
+
+
+def admin_busdetails():
+    global ab
+    if t==0:
+        am.destroy()
+    elif t==1:
+        abd.destroy()
+    global bus,driver,type1,type2,mode,fr,to,tim,price,seat
+    ab=Tk()
+    ab.config(bg="thistle2")
+    ab.geometry("1400x1050")
+    photo = PhotoImage(file=r"E:\cs proj\bg8.1.png")
+    a=Label(image=photo)
+    a.image=(photo)
+    a.pack()
+    bus=IntVar()
+    driver=StringVar()
+    type1=IntVar()
+    type2=IntVar()
+    mode=IntVar()
+    fr=StringVar()
+    to=StringVar()
+    tim=StringVar()
+    price=IntVar()
+    seat=IntVar()
+    cur.execute("select busno from busdetail")
+    s=cur.fetchall()
+    mycon.commit()
+    n=cur.rowcount
+    cur.execute("select arriv,dept from places")
+    pl=cur.fetchall()
+    mycon.commit()
+    pl1,pl2=[],[]
+    for i in pl:
+        if i[0]!='NULL':
+            pl1.append(i[0])
+        if i[1]!='NULL':
+            pl2.append(i[1])
+    Label(ab,text="Bus No available",bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",18,"bold")).place(x=550,y=10)
+    d=60
+    listbox = Listbox(ab,height=20,width = 8,font=("Comic Sans MS",12,"bold"))
+    for i in range(n):
+        listbox.insert(n+1,str(s[i][0]))
+        listbox.place(x=570,y=60)
+    Label(ab,text="Bus No",bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",20,"bold")).place(x=10,y=10)
+    bus_entry=Entry(ab,textvariable=bus,bg="mintcream",fg="aquamarine4",font=("Comic Sans MS",16,"bold")).place(x=200,y=10)
+    Label(ab,text="Travel Name",bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",20,"bold")).place(x=10,y=100)
+    driver_entry=Entry(ab,textvariable=driver,bg="mintcream",fg="aquamarine4",font=("Comic Sans MS",16,"bold")).place(x=200,y=100)
+    Label(ab,text="Type1",bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",20,"bold")).place(x=10,y=200)
+    Radiobutton(ab,bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",18,"bold"),text="AC",value=1,variable=type1).place(x=110,y=200)
+    Radiobutton(ab,bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",18,"bold"),text="Non-AC",value=2,variable=type1).place(x=110,y=250)
+    Label(ab,text="Type2",bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",20,"bold")).place(x=10,y=350)
+    Radiobutton(ab,bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",20,"bold"),text="Ordinary",value=1,variable=type2).place(x=110,y=350)
+    Radiobutton(ab,bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",20,"bold"),text="Deluxe",value=2,variable=type2).place(x=110,y=400)
+    Radiobutton(ab,bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",20,"bold"),text="Super-Deluxe",value=3,variable=type2).place(x=110,y=450)
+    Label(ab,text="Mode",bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",20,"bold")).place(x=10,y=530)
+    Radiobutton(ab,bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",20,"bold"),text="Sleeper",value=1,variable=mode).place(x=110,y=530)
+    Radiobutton(ab,bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",20,"bold"),text="Non-Sleeper",value=2,variable=mode).place(x=110,y=580)
+    Label(ab,bg="Pale Turquoise1",fg="aquamarine4",text='From Location',font=("Comic Sans MS",18,"bold")).place(x=770,y=10)
+    frm=ttk.Combobox(ab,textvariable=fr,width=10,font=("Comic Sans MS",18,"bold"))
+    frm['values']=pl1
+    frm.place(x=1000,y=10)
+    frm.current(0)
+    Label(ab,text="To Location",bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",18,"bold")).place(x=770,y=100)
+    top=ttk.Combobox(ab,textvariable=to,width=10,font=("Comic Sans MS",18,"bold"))
+    top['values']=pl2
+    top.place(x=1000,y=100)
+    top.current(0)
+    Label(ab,text="Timings(1-24hrs)",bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",18,"bold")).place(x=770,y=190)
+    tim_entry=Entry(ab,textvariable=tim,bg="mintcream",fg="aquamarine4",font=("Comic Sans MS",16,"bold")).place(x=1000,y=190)
+    Label(ab,text="Cost/person",bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",18,"bold")).place(x=770,y=280)
+    price_entry=Entry(ab,textvariable=price,bg="mintcream",fg="aquamarine4",font=("Comic Sans MS",16,"bold")).place(x=1000,y=280)
+    Label(ab,text="No of Seats",bg="Pale Turquoise1",fg="aquamarine4",font=("Comic Sans MS",18,"bold")).place(x=770,y=370)
+    seat_entry=Entry(ab,textvariable=seat,bg="mintcream",fg="aquamarine4",font=("Comic Sans MS",16,"bold")).place(x=1000,y=370)
+    Button(ab,height=1,width=5,text="OK",bg="Pale Turquoise1",fg="aquamarine4",relief=GROOVE,bd=6,activebackground="lightsteelblue",activeforeground="midnightblue",font=("Comic Sans MS",20,"bold"),command=admin_busdetailok).place(x=1000,y=500)
+    Button(ab,height=1,width=5,text="BACK",bg="Pale Turquoise1",fg="aquamarine4",relief=GROOVE,bd=6,activebackground="lightsteelblue",activeforeground="midnightblue",font=("Comic Sans MS",22,"bold"),command=back).place(x=800,y=500)   
+
+
+def back():
+    global zl
+    if zl==0:
+        ab.destroy()
+    admin_mainscreen()   
+   
+def admin_busdetailok():
+    global abd
+    a=bus.get()
+    b=driver.get()
+    c=type1.get()
+    d=type2.get()
+    e=mode.get()
+    f=fr.get()
+    g=to.get()
+    h=tim.get()
+    i=price.get()
+    j=seat.get()
+    cur.execute('select busno from busdetail')
+    k=cur.fetchall()
+    mycon.commit()
+    if a==0 or b=='' or c==0 or d==0 or e==0 or f=='' or g=='' or h=='' or i==0 or j==0:
+        messagebox.showinfo("Error","Enter all Values")
+    elif f==g:
+        messagebox.showerror('Error','From Location and To Location cannot be same')
+    elif a in [l[0] for l in k]:
+        messagebox.showerror("Error","This bus no already exists")
+    else:
+        sd=["AC","Non-AC"]
+        sb=sd[c-1]
+        se=["Ordinary","Deluxe","Sup-Deluxe"]
+        sf=se[d-1]
+        sg=["Sleeper","Non Sleeper"]
+        sh=sg[e-1]
+        s="insert into busdetail(busno,driver,type1,type2,mode,froloc,toloc,timing,costpp,seats) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+        val=(a,b,sb,sf,sh,f,g,h,i,j)
+        cur.execute(s,val)
+        mycon.commit()
+        messagebox.showinfo("Info","Bus Added Successfully")
+        ab.destroy()
+        admin_mainscreen()
+
+
+def admo():
+    global zl
+    if zl==0:
+        am.destroy()
+    admin_modify()
+
+
+def admin_modify():
+    global adm
+    global bus,mod
+    adm=Tk()
+    adm.config(bg="light steel blue")
+    adm.geometry("1400x1050")
+    photo = PhotoImage(file=r"E:\cs proj\bg33.1.png")
+    a=Label(image=photo)
+    a.image=(photo)
+    a.pack()
+    bus=StringVar()
+    mod=StringVar()
+    cur.execute("select busno from busdetail")
+    s=cur.fetchall()
+    mycon.commit()
+    n=cur.rowcount
+    d=60
+    for i in range(n):
+        lk=ttk.Combobox(adm,textvariable=bus,width=10,font=("Comic Sans MS",20,"bold"))
+        lk['values']=s
+        lk.place(x=300,y=150)
+        lk.current(0)
+    Label(adm,text=" Select Bus No to Modify",bg="lightsteelblue",fg="midnightblue",font=("Comic Sans MS",22,"bold")).place(x=300,y=60)
+    w=ttk.Combobox(adm,textvariable=mod,width=10,font=("Comic Sans MS",20,"bold"))
+    w['values']=('Travel name','Type1','Type2','Mode','From','To','Timing','Cost','No of seats')
+    w.place(x=800,y=150)
+    w.current(0)
+    Label(adm,text="select which field to modify",bg="light steel blue",fg="blue4",font=("Comic Sans MS",22,"bold")).place(x=800,y=60)
+    Button(adm,width=5,height=1,text="OK",bg="skyblue",fg="navy",font=("Comic Sans MS",22,"bold"),relief=GROOVE,bd=6,activebackground="lightsteelblue",activeforeground="midnightblue",command=admin_modifyok).place(x=550,y=500)
+    Button(adm,height=1,width=5,text="BACK",bg="skyblue",fg="navy",font=("Comic Sans MS",22,"bold"),relief=GROOVE,bd=6,activebackground="lightsteelblue",activeforeground="midnightblue",command=back1).place(x=400,y=500)
+def back1():
+    global zl
+    if zl==0:
+        adm.destroy()
+    admin_mainscreen()
+   
+def admin_modifyok():
+    a=bus.get()
+    b=mod.get()
+    if a==0 or b=='':
+        messagebox.showerror("Error","Enter all Values")
+    else:
+        global amo
+        adm.destroy()
+        global driv,typ1,typ2,mo,from1,to1,time1,price1,seat1,l
+        amo=Tk()
+        amo.config(bg="sandy brown")
+        amo.geometry("1400x1050")
+        ph=PhotoImage(file=r"E:\cs proj\bg9.1.png")
+        la=Label(image=ph)
+        la.image=ph
+        la.pack()
+        driv=StringVar()
+        typ1=IntVar()
+        typ2=IntVar()
+        mo=IntVar()
+        from1=StringVar()
+        to1=StringVar()
+        time1=StringVar()
+        price1=IntVar()
+        seat1=IntVar()
+        if b.lower()=="travel name":
+            Label(amo,text=" Enter Travel name to Modify",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=450,y=20)
+            dri_entry=Entry(amo,textvariable=driv,font=("Comic Sans MS",20,"bold"),bg="azure",fg="cadet blue").place(x=500,y=90)
+            Label(amo,text="Travel names available",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=30,y=20)
+            Label(amo,text="Existing Travel Name",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=900,y=20)
+            cur.execute("select driver from busdetail")
+            s=cur.fetchall()
+            mycon.commit()
+            n=cur.rowcount
+            d=90
+            cur.execute("select driver from busdetail where busno={}".format(a))
+            z=cur.fetchall()
+            mycon.commit()
+            Label(amo,text=z,font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=1020,y=90)
+            for i in range(n):
+                kk=ttk.Combobox(amo,textvariable=driv,width=10,font=("Comic Sans MS",18,"bold"))
+                kk['values']=s
+                kk.place(x=100,y=90)
+                kk.current(0)
+        elif b.lower()=="type1":
+            Label(amo,text="Select Type1 to Modify",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=400,y=40)
+            Label(amo,text="Existing Type",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=1000,y=40)
+            Radiobutton(amo,bg="light coral",fg="black",font=("Comic Sans MS",22,"bold"),text="AC",activebackground="light coral",activeforeground="midnightblue",value=1,variable=typ1).place(x=500,y=120)
+            Radiobutton(amo,bg="light coral",fg="black",font=("Comic Sans MS",22,"bold"),text="Non-AC",activebackground="light coral",activeforeground="midnightblue",value=2,variable=typ1).place(x=500,y=200)
+            cur.execute("select type1 from busdetail where busno={}".format(a))
+            l=cur.fetchall()
+            mycon.commit()
+            Label(amo,text=l,font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=1020,y=90)
+        elif b.lower()=="type2":
+            Label(amo,text="Select Type2 to Modify",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=400,y=40)
+            Label(amo,text="Existing Type",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=1000,y=40)
+            Radiobutton(amo,bg="light coral",fg="black",font=("Comic Sans MS",22,"bold"),text="Ordinary",activebackground="light coral",activeforeground="midnightblue",value=1,variable=typ2).place(x=500,y=120)
+            Radiobutton(amo,bg="light coral",fg="black",font=("Comic Sans MS",22,"bold"),text="Deluxe",activebackground="light coral",activeforeground="midnightblue",value=2,variable=typ2).place(x=500,y=200)
+            Radiobutton(amo,bg="light coral",fg="black",font=("Comic Sans MS",22,"bold"),text="Super Deluxe ",value=3,variable=typ2).place(x=500,y=280)
+            cur.execute("select type2 from busdetail where busno={}".format(a))
+            j=cur.fetchall()
+            mycon.commit()
+            Label(amo,text=j,font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=1020,y=90)
+        elif b.lower()=="mode":
+            Label(amo,text="Select Mode to Modify",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=400,y=40)
+            Label(amo,text="Existing Type",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=1000,y=40)
+            Radiobutton(amo,bg="light coral",fg="black",font=("Comic Sans MS",22,"bold"),text="Sleeper",activebackground="light coral",activeforeground="midnightblue",value=1,variable=mo).place(x=500,y=120)
+            Radiobutton(amo,bg="light coral",fg="black",font=("Comic Sans MS",22,"bold"),text="Non-Sleeper",activebackground="light coral",activeforeground="midnightblue",value=2,variable=mo).place(x=500,y=200)
+            cur.execute("select mode from busdetail where busno={}".format(a))
+            v=cur.fetchall()
+            mycon.commit()
+            Label(amo,text=str(v[0][0]),font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=1020,y=90)
+        elif b.lower()=="from":
+            frm2=ttk.Combobox(amo,textvariable=from1,width=10,font=("Comic Sans MS",18,"bold"))
+            frm2['values']=('Chennai','Ooty',"Coimbatore","Madurai","Kodaikanal",'Salem',"Trichy","Tirunelveli","Kanyakumari","Vellore","Tuticorin","Yercaud","Mahabalipuram","Pondicherry","Thanjavur","Erode","Dindigul","Tiruppur","Kanchipuram",'Viluppuram','Dharmapuri','Nagapattimam','Chengalpattu','Kumbakonam','Pudukkottai',"Karur",'Sivakasi','Nagarcoil','Pollachi','Neiveli','Tiruvannamalai')
+            frm2.place(x=600,y=100)
+            frm2.current(0)
+            Label(amo,text=" Select From to Modify",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=600,y=30)
+            Label(amo,text="Existing From Value",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=200,y=40)
+            cur.execute("select froloc from busdetail where busno={}".format(a))
+            s=cur.fetchall()
+            n=cur.rowcount
+            mycon.commit()
+            d=100
+            for i in range(n):
+                Label(amo,text=str(s[0][0]),bg="mintcream",fg="cadet blue",font=("Comic Sans MS",22,"bold")).place(x=300,y=d)
+                d+=60
+        elif b.lower()=="to":
+            to=ttk.Combobox(amo,textvariable=to1,width=10,font=("Comic Sans MS",18,"bold"))
+            to['values']=('Chennai','Ooty',"Coimbatore","Madurai","Kodaikanal",'Salem',"Trichy","Tirunelveli","Kanyakumari","Vellore","Tuticorin","Yercaud","Mahabalipuram","Pondicherry","Thanjavur","Erode","Dindigul","Tiruppur","Kanchipuram",'Viluppuram','Dharmapuri','Nagapattimam','Chengalpattu','Kumbakonam','Pudukkottai',"Karur",'Sivakasi','Nagarcoil','Pollachi','Neiveli','Tiruvannamalai')
+            to.place(x=600,y=100)
+            to.current(0)
+            Label(amo,text="Select To to Modify",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=600,y=30)
+            Label(amo,text="Existing To Value",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=200,y=40)
+            cur.execute("select toloc from busdetail where busno={}".format(a))
+            s=cur.fetchall()
+            n=cur.rowcount
+            mycon.commit()
+            d=100
+            for i in range(n):
+                Label(amo,text=str(s[0][0]),bg="mintcream",fg="cadet blue",font=("Comic Sans MS",22,"bold")).place(x=200,y=d)
+                d+=60
+        elif b.lower()=="timing":
+            Label(amo,text=" Enter Timing to Modify",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=600,y=30)
+            tim_entry=Entry(amo,textvariable=time1,font=("Comic Sans MS",20,"bold"),bg="mintcream",fg="cadet blue").place(x=600,y=100)
+            Label(amo,text="Existing Timing",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=200,y=40)
+            cur.execute("select timing from busdetail where busno={}".format(a))
+            s=cur.fetchall()
+            n=cur.rowcount
+            mycon.commit()
+            d=100
+            Label(amo,text=str(s[0][0]),bg="mintcream",fg="cadet blue",font=("Comic Sans MS",22,"bold")).place(x=200,y=d)
+        elif b.lower()=="cost":
+            Label(amo,text=" Enter cost to Modify",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=600,y=30)
+            price_entry=Entry(amo,textvariable=price1,font=("Comic Sans MS",20,"bold"),bg="azure",fg="cadet blue").place(x=600,y=100)
+            Label(amo,text="Existing Cost",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=200,y=40)
+            cur.execute("select costpp from busdetail where busno={}".format(a))
+            s=cur.fetchall()
+            n=cur.rowcount
+            mycon.commit()
+            d=100
+            for i in range(n):
+                Label(amo,text=str(s[0][0]),bg="mintcream",fg="cadet blue",font=("Comic Sans MS",22,"bold")).place(x=200,y=d)
+                d+=60
+        elif b.lower()=="no of seats":
+            Label(amo,text=" Enter No of seats to Modify",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=600,y=30)
+            seat_entry=Entry(amo,textvariable=seat1,font=("Comic Sans MS",20,"bold"),bg="azure",fg="cadet blue").place(x=600,y=100)
+            Label(amo,text="Existing No of Seats",font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=200,y=40)
+            cur.execute("select seats from busdetail where busno={}".format(a))
+            s=cur.fetchall()
+            n=cur.rowcount
+            mycon.commit()
+            d=100
+            for i in range(n):
+                Label(amo,text=str(s[0][0]),font=("Comic Sans MS",22,"bold"),bg="mintcream",fg="cadet blue").place(x=200,y=d)
+        else:
+            Label(amo,text="This travel does not exist",font=("Comic Sans MS",22,"bold")).place(x=800,y=30)
+        Button(amo,width=5,height=1,text="OK",command=admin_modifyok2,bg="skyblue",fg="navy",font=("Comic Sans MS",22,"bold"),relief=GROOVE,bd=6,activebackground="light coral",activeforeground="midnightblue").place(x=550,y=400)
+        Button(amo,height=1,width=5,text="BACK",bg="skyblue",fg="navy",font=("Comic Sans MS",22,"bold"),command=back2,relief=GROOVE,bd=6,activebackground="light coral",activeforeground="midnightblue").place(x=400,y=400)
+       
+def back2():
+    global zl
+    if zl==0:
+        amo.destroy()
+    admin_modify()
+
+
+def admin_modifyok2():
+    global amk
+    a=bus.get()
+    b=mod.get()
+    c=driv.get()
+    op=typ1.get()
+    os=["AC","Non-AC"]
+    sb=os[op-1]
+    d=typ2.get()
+    se=["Ordinary","Deluxe","Sup-Deluxe"]
+    sf=se[d-1]
+    e=mo.get()
+    sg=["Sleeper","Non Sleeper"]
+    sh=sg[e-1]
+    g=from1.get()
+    h=to1.get()
+    i=time1.get()
+    j=price1.get()
+    k=seat1.get()
+    if b.lower()=="travel name":
+        cur.execute("select driver from busdetail where busno={}".format(a))
+        z=cur.fetchall()
+        mycon.commit()
+        if c==z[0][0]:
+            messagebox.showerror('Error','This value already exists')
+        else:
+            t="update busdetail set driver=%s where busno=%s"
+            val=(c,a)
+            cur.execute(t,val)
+            mycon.commit()
+            messagebox.showinfo("Info","Bus Modified Successfully")
+            amo.destroy()
+            admin_mainscreen()
+    elif b.lower()=="type1":
+        cur.execute("select type1 from busdetail where busno={}".format(a))
+        j=cur.fetchall()
+        mycon.commit()
+        if sb==j[0][0]:
+            messagebox.showerror('Error','This value already exists')
+        else:
+            t="update busdetail set type1=%s where busno=%s"
+            val=(sb,a)
+            cur.execute(t,val)
+            mycon.commit()
+            messagebox.showinfo("Info","Bus Modified Successfully")
+            amo.destroy()
+            admin_mainscreen()
+    elif b.lower()=="type2":
+        cur.execute("select type2 from busdetail where busno={}".format(a))
+        j=cur.fetchall()
+        mycon.commit()
+        if sf==j[0][0]:
+            messagebox.showerror('Error','This value already exists')
+        else:
+            t="update busdetail set type2=%s where busno=%s"
+            val=(sf,a)
+            cur.execute(t,val)
+            mycon.commit()
+            messagebox.showinfo("Info","Bus Modified Successfully")
+            amo.destroy()
+            admin_mainscreen()
+    elif b.lower()=="mode":
+        cur.execute("select mode from busdetail where busno={}".format(a))
+        v=cur.fetchall()
+        mycon.commit()
+        if sh==v[0][0]:
+            messagebox.showerror('Error','This value already exists')
+        else:
+            t="update busdetail set mode=%s where busno=%s"
+            val=(sh,a)
+            cur.execute(t,val)
+            mycon.commit()
+            messagebox.showinfo("Info","Bus Modified Successfully")
+            amo.destroy()
+            admin_mainscreen()
+    elif b.lower()=="from":
+        cur.execute("select froloc from busdetail where busno={}".format(a))
+        s=cur.fetchall()
+        mycon.commit()
+        print(g,a)
+        if g==s[0][0]:
+            messagebox.showerror('Error','This value already exists')
+        else:
+            cur.execute("update busdetail set froloc='{}' where busno={}".format(g,a))
+            mycon.commit()
+            messagebox.showinfo("Info","Bus Modified Successfully")
+            amo.destroy()
+            admin_mainscreen()
+    elif b.lower()=="to":
+        cur.execute("select toloc from busdetail where busno={}".format(a))
+        s=cur.fetchall()
+        mycon.commit()
+        if h==s[0][0]:
+            messagebox.showerror('Error','This value already exists')
+        else:
+            cur.execute("update busdetail set toloc='{}' where busno={}".format(h,a))
+            mycon.commit()
+            messagebox.showinfo("Info","Bus Modified Successfully")
+            amo.destroy()
+            admin_mainscreen()
+    elif b.lower()=="timing":
+        cur.execute("select timing from busdetail where busno={}".format(a))
+        s=cur.fetchall()
+        mycon.commit()
+        if i==s[0][0]:
+            messagebox.showerror('Error','This value already exists')
+        else:
+            cur.execute("update busdetail set timing='{}' where busno={}".format(i,a))
+            mycon.commit()
+            messagebox.showinfo("Info","Bus Modified Successfully")
+            amo.destroy()
+            admin_mainscreen()
+    elif b.lower()=="cost":
+        cur.execute("select costpp from busdetail where busno={}".format(a))
+        s=cur.fetchall()
+        mycon.commit()
+        if j==s[0][0]:
+            messagebox.showerror('Error','This value already exists')
+            
+        else:
+            cur.execute("update busdetail set costpp='{}' where busno={}".format(j,a))
+            mycon.commit()
+            messagebox.showinfo("Info","Bus Modified Successfully")
+            amo.destroy()
+            admin_mainscreen()
+    elif b.lower()=="no of seats":
+        cur.execute("select seats from busdetail where busno={}".format(a))
+        s=cur.fetchall()
+        mycon.commit()
+        if k==s[0][0]:
+            messagebox.showerror('Error','This value already exists')
+        else:
+            cur.execute("update busdetail set seats='{}' where busno={}".format(k,a))  
+            mycon.commit()
+            messagebox.showinfo("Info","Bus Modified Successfully")
+            amo.destroy()
+            admin_mainscreen()
+   
+def des2():
+    global bl
+    if bl==0:
+        amk.destroy()
+    admin_mainscreen()
+    
+def dest2():
+    global t
+    t=2
+    admin_modify()
+
+
+def admin_remove():
+    global ar
+    am.destroy()                
+    ar=Tk()
+    ar.config(bg="LemonChiffon2")
+    global bus2
+    ar.geometry("1400x1050")
+    photo = PhotoImage(file=r"E:\cs proj\bg49.1.png")
+    a=Label(image=photo)
+    a.image=(photo)
+    a.pack()
+    bus2=IntVar()
+    cur.execute("select busno from busdetail")
+    s=cur.fetchall()
+    mycon.commit()
+    n=cur.rowcount
+    Label(ar,text="Enter Bus No to Remove",font=("Comic Sans MS",22,"bold"),bg="skyblue",fg="navy").place(x=500,y=50)
+    d=90
+    for i in range(n):
+        lk=ttk.Combobox(ar,textvariable=bus2,width=10,font=("Comic Sans MS",18,"bold"))
+        lk['values']=s
+        lk.place(x=500,y=130)
+        lk.current(0)
+    Button(ar,height=1,text="OK",bg="skyblue",fg="navy",font=("Comic Sans MS",22,"bold"),command=admin_removeok,relief=GROOVE,bd=6,activebackground="skyblue",activeforeground="maroon").place(x=600,y=300)
+    Button(ar,height=1,text="Back",bg="skyblue",fg="navy",font=("Comic Sans MS",22,"bold"),command=dest3,relief=GROOVE,bd=6,activebackground="skyblue",activeforeground="maroon").place(x=450,y=300)
+
+
+   
+def admin_removeok():
+    global aro
+    a=bus2.get()
+    if a==0:
+        messagebox.showerror("Error","Enter all Values")
+    else:
+        cur.execute("delete from busdetail where busno={}".format(a))
+        mycon.commit()
+        messagebox.showinfo("Info","Bus Removed Successfully")
+        ar.destroy()
+        admin_mainscreen()
+
+
+def dest3():
+    global t
+    if t==0:
+        ar.destroy()
+    admin_mainscreen()
+
+
+def adrep():
+    global t
+    if t==0:
+        am.destroy()
+    admin_report()
+    
+def admin_report():
+    global rep
+    rep=Tk()
+    rep.geometry("1400x1050")
+    rep.title('Report Mainscreen')
+    photo=PhotoImage(file=r"E:\cs proj\ad6.png")
+    a=Label(image=photo)
+    a.image=(photo)
+    a.pack()
+    Button(rep,text="Departure Location",bg="khaki",fg="black",font=("Comic Sans MS",15,"bold"),command=rep3,relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="Indian red").place(x=500,y=20)
+    Button(rep,text="Arrival Location",bg="lightgoldenrod1",fg="black",font=("Comic Sans MS",15,"bold"),command=rep4,relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="Indian red").place(x=500,y=100)
+    Button(rep,text="Mode(Sleeper/Non Sleeper)",bg="gold",fg="black",font=("Comic Sans MS",15,"bold"),command=rep5,relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="Indian red").place(x=500,y=180)
+    Button(rep,text="Type1(Ac/Non-ac)",bg="goldenrod1",fg="black",font=("Comic Sans MS",15,"bold"),command=rep6,relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="Indian red").place(x=500,y=260)
+    Button(rep,text="Type2(Ordinary/Deluxe/Super-Deluxe)",bg="goldenrod",fg="black",font=("Comic Sans MS",15,"bold"),command=rep7,relief=GROOVE,bd=6,activebackground="skyblue",activeforeground="maroon").place(x=500,y=340)
+    Button(rep,text="Timings",bg="khaki",fg="black",font=("Comic Sans MS",15,"bold"),command=rep8,relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="Indian red").place(x=500,y=420)
+    Button(rep,text="Ticket Cost",bg="lightgoldenrod1",fg="black",font=("Comic Sans MS",15,"bold"),command=rep9,relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="Indian red").place(x=500,y=500)
+    Button(rep,text="Back",bg="lightgoldenrod1",fg="black",font=("Comic Sans MS",15,"bold"),command=rep10,relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="Indian red").place(x=800,y=500)
+
+
+def rep3():
+    global rl
+    rl=1
+    if rl==1:
+        rep.destroy()
+    admin_report2()
+    
+def rep4():
+    global rl
+    rl=2
+    if rl==2:
+        rep.destroy()
+    admin_report2()
+    
+def rep5():
+    global rl
+    rl=3
+    if rl==3:
+        rep.destroy()
+    admin_report2()
+    
+def rep6():
+    global rl
+    rl=4
+    if rl==4:
+        rep.destroy()
+    admin_report2()
+    
+def rep7():
+    global rl
+    rl=5
+    if rl==5:
+        rep.destroy()
+    admin_report2()
+    
+def rep8():
+    global rl
+    rl=6
+    if rl==6:
+        rep.destroy()
+    admin_report2()
+    
+def rep9():
+    global rl
+    rl=7
+    if rl==7:
+        rep.destroy()
+    admin_report2()
+    
+def rep10():
+    global rl
+    rl=8
+    if rl==8:
+        rep.destroy()
+    admin_mainscreen()    
+   
+
+
+def admin_report2():
+    global rep2
+    rep2=Tk()
+    rep2.geometry("1400x1050")
+    rep2.title('Report Mainscreen 2')
+    photo=PhotoImage(file=r"E:\cs proj\ad3.png")
+    a=Label(image=photo)
+    a.image=(photo)
+    a.pack()
+    global ca,cb,cd,ce,cf,cg,ch
+    ca=StringVar()
+    cb=StringVar()
+    cd=IntVar()
+    ce=IntVar()
+    cf=IntVar()
+    cg=IntVar()
+    ch=IntVar()
+    cur.execute("select arriv,dept from places")
+    pl=cur.fetchall()
+    mycon.commit()
+    pl1,pl2=[],[]
+    for i in pl:
+        if i[0]!='NULL':
+            pl1.append(i[0])
+        if i[1]!='NULL':
+            pl2.append(i[1])
+    if rl==1:
+        Label(rep2,text="Select The Departure Location To Get The Report",font=("Comic Sans MS",22,"bold"),bg="skyblue",fg="navy").place(x=450,y=40)
+        frm=ttk.Combobox(rep2,textvariable=ca,width=10,font=("Comic Sans MS",18,"bold"))
+        frm['values']=pl1
+        frm.place(x=550,y=200)
+        frm.current(0)
+        Button(rep2,width=10,height=1,text="OK",font=("Comic Sans MS",15,"bold"),bg="lightpink1",fg="maroon",activebackground="plum1",activeforeground="indianred3",command=admin_reportok1).place(x=500,y=400)
+        Button(rep2,width=10,height=1,text="BACK",font=("Comic Sans MS",15,"bold"),bg="lightpink1",fg="maroon",activebackground="plum1",activeforeground="indianred3",command=adm).place(x=700,y=400)
+    elif rl==2:
+        Label(rep2,text="Select The Arrival Location To Get The Report",font=("Comic Sans MS",22,"bold"),bg="skyblue",fg="navy").place(x=450,y=40)
+        to1=ttk.Combobox(rep2,textvariable=cb,width=10,font=("Comic Sans MS",18,"bold"))
+        to1['values']=pl2
+        to1.place(x=550,y=200)
+        to1.current(0)
+        Button(rep2,width=10,height=1,text="OK",font=("Comic Sans MS",15,"bold"),bg="lightpink1",fg="maroon",activebackground="plum1",activeforeground="indianred3",command=admin_reportok2).place(x=500,y=400)
+        Button(rep2,width=10,height=1,text="BACK",font=("Comic Sans MS",15,"bold"),bg="lightpink1",fg="maroon",activebackground="plum1",activeforeground="indianred3",command=adm1).place(x=700,y=400)
+    elif rl==3:
+        Label(rep2,text="Select The Mode To Get The Report",font=("Comic Sans MS",22,"bold"),bg="skyblue",fg="navy").place(x=500,y=30)
+        ah=Radiobutton(rep2,bg='pink1',fg="indianred3",font=("Comic Sans MS",15,"bold"),activebackground="plum1",activeforeground="indianred3",text="Sleeper",value=1,variable=ce).place(x=540,y=100)
+        ai=Radiobutton(rep2,bg='pink1',fg="indianred3",font=("Comic Sans MS",15,"bold"),activebackground="plum1",activeforeground="indianred3",text="Non-Sleeper",value=2,variable=ce).place(x=540,y=160)
+        Button(rep2,width=10,height=1,text="OK",font=("Comic Sans MS",15,"bold"),bg="lightpink1",fg="maroon",command=admin_reportok3,activebackground="plum1",activeforeground="indianred3").place(x=500,y=250)
+        Button(rep2,width=10,height=1,text="BACK",font=("Comic Sans MS",15,"bold"),bg="lightpink1",fg="maroon",activebackground="plum1",activeforeground="indianred3",command=adm2).place(x=700,y=250)
+    elif rl==4:
+        Label(rep2,text="Select The Type1 To Get The Report",font=("Comic Sans MS",22,"bold"),bg="skyblue",fg="navy").place(x=500,y=30)
+        al=Radiobutton(rep2,bg='peachpuff',fg="indianred3",font=("Comic Sans MS",15,"bold"),activebackground="plum1",activeforeground="indianred3",text="AC",value=1,variable=cf).place(x=500,y=120)
+        am=Radiobutton(rep2,bg='peachpuff',fg="indianred3",font=("Comic Sans MS",15,"bold"),activebackground="plum1",activeforeground="indianred3",text="Non-AC",value=2,variable=cf).place(x=500,y=190)
+        Button(rep2,width=10,height=1,text="OK",font=("Comic Sans MS",15,"bold"),bg="lightpink1",fg="maroon",activebackground="plum1",activeforeground="indianred3",command=admin_reportok4).place(x=500,y=260)
+        Button(rep2,width=10,height=1,text="BACK",font=("Comic Sans MS",15,"bold"),bg="lightpink1",fg="maroon",activebackground="plum1",activeforeground="indianred3",command=adm3).place(x=800,y=260)
+    elif rl==5:
+        Label(rep2,text="Select The Type2 To Get The Report",font=("Comic Sans MS",22,"bold"),bg="skyblue",fg="navy").place(x=500,y=30)
+        ap=Radiobutton(rep2,bg='misty rose',fg="indianred3",font=("Comic Sans MS",15,"bold"),activebackground="plum1",activeforeground="indianred3",text="Ordinary",value=1,variable=cg).place(x=500,y=100)
+        aq=Radiobutton(rep2,bg='misty rose',fg="indianred3",font=("Comic Sans MS",15,"bold"),activebackground="plum1",activeforeground="indianred3",text="Deluxe",value=2,variable=cg).place(x=500,y=180)
+        ar=Radiobutton(rep2,bg='misty rose',fg="indianred3",font=("Comic Sans MS",15,"bold"),activebackground="plum1",activeforeground="indianred3",text="Super Deluxe",value=3,variable=cg).place(x=500,y=250)
+        Button(rep2,width=10,height=1,text="OK",font=("Comic Sans MS",15,"bold"),bg="lightpink1",fg="maroon",activebackground="plum1",activeforeground="indianred3",command=admin_reportok5).place(x=500,y=320)
+        Button(rep2,width=10,height=1,text="BACK",font=("Comic Sans MS",15,"bold"),bg="lightpink1",fg="maroon",activebackground="plum1",activeforeground="indianred3",command=adm4).place(x=700,y=320)
+    elif rl==6:
+        Label(rep2,text="Select The Timings To Get The Report",font=("Comic Sans MS",22,"bold"),bg="skyblue",fg="navy").place(x=500,y=30)
+        av=Radiobutton(rep2,bg='mintcream',fg="salmon",font=("Comic Sans MS",15,"bold"),activebackground="plum1",activeforeground="indianred3",text="1hrs-5hrs",value=1,variable=ch).place(x=500,y=100)
+        av=Radiobutton(rep2,bg='mintcream',fg="salmon",font=("Comic Sans MS",15,"bold"),activebackground="plum1",activeforeground="indianred3",text="6hrs-12hrs",value=2,variable=ch).place(x=500,y=180)
+        aw=Radiobutton(rep2,bg='mintcream',fg="salmon",font=("Comic Sans MS",15,"bold"),activebackground="plum1",activeforeground="indianred3",text="13hrs-18hrs",value=3,variable=ch).place(x=500,y=250)
+        ax=Radiobutton(rep2,bg='mintcream',fg="salmon",font=("Comic Sans MS",15,"bold"),activebackground="plum1",activeforeground="indianred3",text="19hrs-24hrs",value=4,variable=ch).place(x=500,y=320)
+        Button(rep2,width=10,height=1,text="OK",font=("Comic Sans MS",15,"bold"),bg="lightpink1",fg="maroon",activebackground="plum1",activeforeground="indianred3",command=admin_reportok6).place(x=500,y=370)
+        Button(rep2,width=10,height=1,text="BACK",font=("Comic Sans MS",15,"bold"),bg="lightpink1",fg="maroon",activebackground="plum1",activeforeground="indianred3",command=adm5).place(x=700,y=370)
+    elif rl==7:
+        Label(rep2,text="Select the No.Of Seats To Get The Report",font=("Comic Sans MS",22,"bold"),bg="skyblue",fg="navy").place(x=500,y=30)
+        ad=Radiobutton(rep2,bg='plum1',fg="indianred3",font=("Comic Sans MS",15,"bold"),activebackground="plum1",activeforeground="indianred3",text="100-300",value=1,variable=cd).place(x=500,y=100)
+        ae=Radiobutton(rep2,bg='plum1',fg="indianred3",font=("Comic Sans MS",15,"bold"),activebackground="plum1",activeforeground="indianred3",text="300-600",value=2,variable=cd).place(x=500,y=180)
+        af=Radiobutton(rep2,bg='plum1',fg="indianred3",font=("Comic Sans MS",15,"bold"),activebackground="plum1",activeforeground="indianred3",text="600-1000",value=3,variable=cd).place(x=500,y=250)
+        Button(rep2,width=10,height=1,text="OK",font=("Comic Sans MS",15,"bold"),bg="lightpink1",fg="maroon",command=admin_reportok7,activebackground="mintcream",activeforeground="Indian red").place(x=500,y=300)
+        Button(rep2,width=10,height=1,text="BACK",font=("Comic Sans MS",15,"bold"),bg="lightpink1",fg="maroon",command=adm6,activebackground="mintcream",activeforeground="Indian red").place(x=700,y=300)
+
+
+def adm():
+    global cl
+    if cl==0:
+        rep2.destroy()
+    admin_report()
+    
+def adm1():
+    global cl
+    if cl==0:
+        rep2.destroy()
+    admin_report()
+    
+def adm2():
+    global cl
+    if cl==0:
+        rep2.destroy()
+    admin_report()
+    
+def adm3():
+    global cl
+    if cl==0:
+        rep2.destroy()
+    admin_report()
+    
+def adm4():
+    global cl
+    if cl==0:
+        rep2.destroy()
+    admin_report()
+    
+def adm5():
+    global cl
+    if cl==0:
+        rep2.destroy()
+    admin_report()
+    
+def adm6():
+    global cl
+    if cl==0:
+        rep2.destroy()
+    admin_report()      
+
+
+def admin_reportok1():
+    ci=ca.get()
+    if ci==" ":
+        messagebox.showerror("Error","No Value Selected")
+    else:
+        cur.execute("select * from busdetail where froloc='{}'".format(ci))
+        m=cur.fetchall()
+        n=cur.rowcount
+        mycon.commit()    
+        if n==0:
+            messagebox.showerror("Error","No Buses Found for the Given Location")
+        else:
+            global rpt
+            rep2.destroy()
+            rpt=Tk()
+            rpt.config(bg="mintcream")
+            rpt.geometry("1400x1050")
+            rpt.title('Departure Report')
+            canvas = Canvas(rpt)
+            scroll_y = Scrollbar(rpt, orient="vertical",command=canvas.yview)
+            frame = Frame(canvas)
+            ph=PhotoImage(file=r"E:\cs proj\bg8.1.png")
+            la=Label(frame,image=ph)
+            la.image=ph
+            la.pack()
+            su=["Bus No","Travel Name","Type1","Type2","Mode","From","To","Timing","Amount","Seats"]
+            a=8
+            b=10
+            for j in su:
+                Label(frame,text=j,font=("Comic Sans MS",14,"bold")).place(x=a,y=b)
+                a+=133
+            cur.execute("select * from busdetail where froloc='{}'".format(ci))
+            m=cur.fetchall()
+            n=cur.rowcount
+            mycon.commit()
+            d=60
+            for i in range(n):
+                Label(frame,text=str(m[i][0]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=10,y=d)
+                Label(frame,text=str(m[i][1]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=145,y=d)
+                Label(frame,text=str(m[i][2]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=280,y=d)
+                Label(frame,text=str(m[i][3]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=415,y=d)
+                Label(frame,text=str(m[i][4]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=550,y=d)
+                Label(frame,text=str(m[i][5]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=685,y=d)
+                Label(frame,text=str(m[i][6]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=820,y=d)
+                Label(frame,text=str(m[i][7]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=955,y=d)
+                Label(frame,text=str(m[i][8]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=1090,y=d)
+                Label(frame,text=str(m[i][9]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=1225,y=d)
+                d+=60
+            Button(frame,width=22,height=1,text="Go to Report Mainscreen",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",command=rept).place(x=300,y=d+60)
+            Button(frame,width=10,height=1,text="Back",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",command=rept0).place(x=600,y=d+60)
+            Button(frame,width=22,height=1,text="Go to Admin Mainscreen",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",command=res).place(x=800,y=d+60)
+            canvas.create_window(0, 0, anchor='nw', window=frame)
+            canvas.update_idletasks()
+            canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
+            canvas.pack(fill='both', expand=True, side='left')
+            scroll_y.pack(fill='y', side='right')
+def res():
+    global zl
+    if zl==0:
+        rpt.destroy()
+    admin_mainscreen()
+    
+def rept():
+    global zl
+    if zl==0:
+        rpt.destroy()
+    admin_report()
+   
+def rept0():
+    global zl
+    if zl==0:
+        rpt.destroy()
+    admin_report2()
+   
+       
+def admin_reportok2():
+    ci=cb.get()
+    if ci==0:
+        messagebox.showerror("Error","No values Selected")
+    else:
+        cur.execute("select * from busdetail where toloc='{}'".format(ci))
+        m=cur.fetchall()
+        n=cur.rowcount
+        mycon.commit()
+        if n==0:
+            messagebox.showerror("Error","No Buses Found for the Given Location")
+        else:
+            global rpt1
+            rep2.destroy()
+            rpt1=Tk()
+            rpt1.title('Arrival Report')
+            canvas = Canvas(rpt1)
+            scroll_y = Scrollbar(rpt1, orient="vertical",command=canvas.yview)
+            frame = Frame(canvas)
+            rpt1.config(bg="mintcream")
+            rpt1.geometry("1400x1050")
+            ph=PhotoImage(file=r"E:\cs proj\bg1.png")
+            la=Label(frame,image=ph)
+            la.image=ph
+            la.pack()
+            su=["Bus No","Driver Name","Type1","Type2","Mode","From","To","Timing","Amount","Seats"]
+            a=8
+            b=10
+            for j in su:
+                Label(frame,text=j,font=("Comic Sans MS",14,"bold")).place(x=a,y=b)
+                a+=133
+            cur.execute("select * from busdetail where toloc='{}'".format(ci))
+            m=cur.fetchall()
+            n=cur.rowcount
+            mycon.commit()
+            d=60
+            for i in range(n):
+                Label(frame,text=str(m[i][0]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=10,y=d)
+                Label(frame,text=str(m[i][1]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=145,y=d)
+                Label(frame,text=str(m[i][2]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=280,y=d)
+                Label(frame,text=str(m[i][3]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=415,y=d)
+                Label(frame,text=str(m[i][4]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=550,y=d)
+                Label(frame,text=str(m[i][5]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=685,y=d)
+                Label(frame,text=str(m[i][6]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=820,y=d)
+                Label(frame,text=str(m[i][7]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=955,y=d)
+                Label(frame,text=str(m[i][8]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=1090,y=d)
+                Label(frame,text=str(m[i][9]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=1225,y=d)
+                d+=60
+            Button(frame,width=22,height=1,text="Go to Report Mainscreen",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="peachpuff",activeforeground="indianred3",command=rept2).place(x=300,y=d+60)
+            Button(frame,width=10,height=1,text="Back",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="peachpuff",activeforeground="indianred3",command=rept3).place(x=600,y=d+60)
+            Button(frame,width=22,height=1,text="Go to Admin Mainscreen",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="peachpuff",activeforeground="indianred3",command=res1).place(x=800,y=d+60)
+            canvas.create_window(0, 0, anchor='nw', window=frame)
+            canvas.update_idletasks()
+            canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
+            canvas.pack(fill='both', expand=True, side='left')
+            scroll_y.pack(fill='y', side='right')
+def res1():
+    global zl
+    if zl==0:
+        rpt1.destroy()
+    admin_mainscreen()
+   
+def rept2():
+    global zl
+    if zl==0:
+        rpt1.destroy()
+    admin_report()
+
+
+def rept3():
+    global zl
+    if zl==0:
+        rpt1.destroy()
+    admin_report2()    
+
+
+       
+def admin_reportok3():
+    cl=ce.get()
+    if cl==0:
+        messagebox.showerror("Error","No Values selected")
+    else:
+        aj=["sleeper","non-sleeper"]
+        de=aj[cl-1]    
+        cur.execute("select * from busdetail where mode='{}'".format(de))
+        m=cur.fetchall()
+        n=cur.rowcount
+        mycon.commit()
+        if n==0:
+            messagebox.showerror("Error","No Buses Found for the Given Mode")
+        else:
+            global rpt2
+            rep2.destroy()
+            rpt2=Tk()
+            rpt2.title('Mode Report')
+            canvas = Canvas(rpt2)
+            scroll_y = Scrollbar(rpt2, orient="vertical",command=canvas.yview)
+            frame = Frame(canvas)
+            rpt2.config(bg="mintcream")
+            rpt2.geometry("1400x1050")
+            ph=PhotoImage(file=r"E:\cs proj\bg50.1.png")
+            la=Label(frame,image=ph)
+            la.image=ph
+            la.pack()
+            su=["Bus No","Driver Name","Type1","Type2","Mode","From","To","Timing","Amount","Seats"]
+            a=8
+            b=10
+            for j in su:
+                Label(frame,text=j,font=("Comic Sans MS",14,"bold")).place(x=a,y=b)
+                a+=133
+            aj=["sleeper","non-sleeper"]
+            de=aj[cl-1]    
+            cur.execute("select * from busdetail where mode='{}'".format(de))
+            m=cur.fetchall()
+            n=cur.rowcount
+            mycon.commit()
+            d=60
+            for i in range(n):
+                Label(frame,text=str(m[i][0]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=10,y=d)
+                Label(frame,text=str(m[i][1]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=145,y=d)
+                Label(frame,text=str(m[i][2]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=280,y=d)
+                Label(frame,text=str(m[i][3]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=415,y=d)
+                Label(frame,text=str(m[i][4]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=550,y=d)
+                Label(frame,text=str(m[i][5]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=685,y=d)
+                Label(frame,text=str(m[i][6]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=820,y=d)
+                Label(frame,text=str(m[i][7]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=955,y=d)
+                Label(frame,text=str(m[i][8]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=1090,y=d)
+                Label(frame,text=str(m[i][9]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=1225,y=d)
+                d+=60  
+            Button(frame,width=22,height=1,text="Go to Report Mainscreen",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="mistyrose",activeforeground="indianred3",command=rept9).place(x=300,y=d+60)
+            Button(frame,width=10,height=1,text="Back",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="mistyrose",activeforeground="indianred3",command=rept10).place(x=600,y=d+60)
+            Button(frame,width=22,height=1,text="Go to Admin Mainscreen",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="mistyrose",activeforeground="indianred3",command=res2).place(x=800,y=d+60)
+            canvas.create_window(0, 0, anchor='nw', window=frame)
+            canvas.update_idletasks()
+            canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
+            canvas.pack(fill='both', expand=True, side='left')
+            scroll_y.pack(fill='y', side='right')
+def rept9():
+    global nl
+    if nl==0:
+        rpt2.destroy()
+    admin_report()
+    
+def rept10():
+    global zl
+    if zl==0:
+        rpt2.destroy()
+    admin_report2()
+    
+def res2():
+    global zl
+    if zl==0:
+        rpt2.destroy()
+    admin_mainscreen()    
+      
+       
+def admin_reportok4():
+    cl=cf.get()
+    if cl==0:
+        messagebox.showerror("Error","No Values selected")
+    else:
+        an=["ac","non-ac"]
+        df=an[cl-1]    
+        cur.execute("select * from busdetail where type1='{}'".format(df))
+        m=cur.fetchall()
+        n=cur.rowcount
+        mycon.commit()
+        if n==0:
+            messagebox.showerror("Error","No Buses Found For the Given Type")
+        else:
+            global rpt3
+            rep2.destroy()
+            rpt3=Tk()
+            rpt3.title('Type1 Report')
+            canvas = Canvas(rpt3)
+            scroll_y = Scrollbar(rpt3, orient="vertical",command=canvas.yview)
+            frame = Frame(canvas)
+            rpt3.config(bg="mintcream")
+            rpt3.geometry("1400x1050")
+            ph=PhotoImage(file=r"E:\cs proj\ad4.png")
+            la=Label(frame,image=ph)
+            la.image=ph
+            la.pack()
+            su=["Bus No","Driver Name","Type1","Type2","Mode","From","To","Timing","Amount","Seats"]
+            a=8
+            b=10
+            for j in su:
+                Label(frame,text=j,font=("Comic Sans MS",14,"bold")).place(x=a,y=b)
+                a+=133
+            an=["ac","non-ac"]
+            df=an[cl-1]    
+            cur.execute("select * from busdetail where type1='{}'".format(df))
+            m=cur.fetchall()
+            n=cur.rowcount
+            mycon.commit()
+            d=60
+            for i in range(n):
+                Label(frame,text=str(m[i][0]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=10,y=d)
+                Label(frame,text=str(m[i][1]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=145,y=d)
+                Label(frame,text=str(m[i][2]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=280,y=d)
+                Label(frame,text=str(m[i][3]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=415,y=d)
+                Label(frame,text=str(m[i][4]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=550,y=d)
+                Label(frame,text=str(m[i][5]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=685,y=d)
+                Label(frame,text=str(m[i][6]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=820,y=d)
+                Label(frame,text=str(m[i][7]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=955,y=d)
+                Label(frame,text=str(m[i][8]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=1090,y=d)
+                Label(frame,text=str(m[i][9]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=1225,y=d)
+                d+=60
+            Button(frame,width=22,height=1,text="Go to Report Mainscreen",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="skyblue",activeforeground="indianred3",command=rept5).place(x=300,y=d+60)
+            Button(frame,width=10,height=1,text="Back",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="skyblue",activeforeground="indianred3",command=rept11).place(x=600,y=d+60)
+            Button(frame,width=22,height=1,text="Go to Admin Mainscreen",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="skyblue",activeforeground="indianred3",command=res3).place(x=800,y=d+60)
+            canvas.create_window(0, 0, anchor='nw', window=frame)
+            canvas.update_idletasks()
+            canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
+            canvas.pack(fill='both', expand=True, side='left')
+            scroll_y.pack(fill='y', side='right')
+
+
+def rept5():
+    global nl
+    if nl==0:
+        rpt3.destroy()
+    admin_report()
+    
+def rept11():
+    global nl
+    if nl==0:
+        rpt3.destroy()
+    admin_report2()
+    
+def res3():
+    global nl
+    if nl==0:
+        rpt3.destroy()
+    admin_mainscreen()    
+         
+def admin_reportok5():
+    cl=cg.get()
+    if cl==0:
+        messagebox.showerror("Error","No Value selected")
+    else:
+        an=["ordinary","deluxe","sup-deluxe"]
+        df=an[cl-1]    
+        cur.execute("select * from busdetail where type2='{}'".format(df))
+        m=cur.fetchall()
+        n=cur.rowcount
+        mycon.commit()
+        if n==0:
+            messagebox.showerror("Error","No Buses Found For the Given Type2")
+        else:
+            global rpt4
+            rep2.destroy()
+            rpt4=Tk()
+            rpt4.title('Type2 Report')
+            canvas = Canvas(rpt4)
+            scroll_y = Scrollbar(rpt4, orient="vertical",command=canvas.yview)
+            frame = Frame(canvas)
+            rpt4.config(bg="mintcream")
+            rpt4.geometry("1400x1050")
+            ph=PhotoImage(file=r"E:\cs proj\ad7.png")
+            la=Label(frame,image=ph)
+            la.image=ph
+            la.pack()
+            su=["Bus No","Driver Name","Type1","Type2","Mode","From","To","Timing","Amount","Seats"]
+            a=8
+            b=10
+            for j in su:
+                Label(frame,text=j,font=("Comic Sans MS",14,"bold")).place(x=a,y=b)
+                a+=133
+            an=["ordinary","deluxe","sup-deluxe"]
+            df=an[cl-1]    
+            cur.execute("select * from busdetail where type2='{}'".format(df))
+            m=cur.fetchall()
+            n=cur.rowcount
+            mycon.commit()
+            d=60
+            for i in range(n):
+                Label(frame,text=str(m[i][0]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=10,y=d)
+                Label(frame,text=str(m[i][1]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=145,y=d)
+                Label(frame,text=str(m[i][2]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=280,y=d)
+                Label(frame,text=str(m[i][3]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=415,y=d)
+                Label(frame,text=str(m[i][4]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=550,y=d)
+                Label(frame,text=str(m[i][5]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=685,y=d)
+                Label(frame,text=str(m[i][6]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=820,y=d)
+                Label(frame,text=str(m[i][7]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=955,y=d)
+                Label(frame,text=str(m[i][8]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=1090,y=d)
+                Label(frame,text=str(m[i][9]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=1225,y=d)
+                d+=60
+            Button(frame,width=22,height=1,text="Go to Report Mainscreen",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="light grey",activeforeground="violet red",command=rept6).place(x=300,y=d+60)
+            Button(frame,width=10,height=1,text="Back",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="light grey",activeforeground="violet red",command=rept12).place(x=600,y=d+60)
+            Button(frame,width=22,height=1,text="Go to Admin Mainscreen",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="light grey",activeforeground="violet red",command=res4).place(x=800,y=d+60)
+            canvas.create_window(0, 0, anchor='nw', window=frame)
+            canvas.update_idletasks()
+            canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
+            canvas.pack(fill='both', expand=True, side='left')
+            scroll_y.pack(fill='y', side='right')
+
+
+def rept6():
+    global nl
+    if nl==0:
+        rpt4.destroy()
+    admin_report()
+    
+def rept12():
+    global nl
+    if nl==0:
+        rpt4.destroy()
+    admin_report2()
+    
+def res4():
+    global zl
+    if zl==0:
+        rpt4.destroy()
+    admin_mainscreen()  
+   
+def admin_reportok6():
+    cl=ch.get()
+    if cl==0:
+        messagebox.showerror("Error","No Values selected")
+    else:
+        ay=[[1,5],[6,12],[13,18],[19,24]]
+        dh=ay[cl-1]    
+        s="select * from busdetail where timing>=%s and timing<=%s"
+        val=(dh[0],dh[1])
+        cur.execute(s,val)
+        m=cur.fetchall()
+        n=cur.rowcount
+        if n==0:
+            messagebox.showerror("Error","No Buses Found For the Given Timings")
+        else:
+            global rpt5
+            rep2.destroy()
+            rpt5=Tk()
+            rpt5.title('Timing Report')
+            canvas = Canvas(rpt5)
+            scroll_y = Scrollbar(rpt5, orient="vertical",command=canvas.yview)
+            frame = Frame(canvas)
+            rpt5.config(bg="mintcream")
+            rpt5.geometry("1400x1050")
+            ph=PhotoImage(file=r"E:\cs proj\bg50.1.png")
+            la=Label(frame,image=ph)
+            la.image=ph
+            la.pack()
+            su=["Bus No","Driver Name","Type1","Type2","Mode","From","To","Timing","Amount","Seats"]
+            a=8
+            b=10
+            for j in su:
+                Label(frame,text=j,font=("Comic Sans MS",14,"bold")).place(x=a,y=b)
+                a+=133
+            ay=[[1,5],[6,12],[13,18],[19,24]]
+            dh=ay[cl-1]    
+            s="select * from busdetail where timing>=%s and timing<=%s"
+            val=(dh[0],dh[1])
+            cur.execute(s,val)
+            m=cur.fetchall()
+            n=cur.rowcount
+            mycon.commit()
+            d=60
+            for i in range(n):
+                Label(frame,text=str(m[i][0]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=10,y=d)
+                Label(frame,text=str(m[i][1]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=145,y=d)
+                Label(frame,text=str(m[i][2]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=280,y=d)
+                Label(frame,text=str(m[i][3]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=415,y=d)
+                Label(frame,text=str(m[i][4]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=550,y=d)
+                Label(frame,text=str(m[i][5]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=685,y=d)
+                Label(frame,text=str(m[i][6]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=820,y=d)
+                Label(frame,text=str(m[i][7]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=955,y=d)
+                Label(frame,text=str(m[i][8]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=1090,y=d)
+                Label(frame,text=str(m[i][9]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=1225,y=d)
+                d+=60
+            Button(frame,width=22,height=1,text="Go to Report Mainscreen",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="light pink",activeforeground="purple",command=rept7).place(x=300,y=d+60)
+            Button(frame,width=10,height=1,text="Back",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="light pink",activeforeground="purple",command=rept13).place(x=600,y=d+60)
+            Button(frame,width=22,height=1,text="Go to Admin Mainscreen",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="light pink",activeforeground="purple",command=res5).place(x=800,y=d+60)
+            canvas.create_window(0, 0, anchor='nw', window=frame)
+            canvas.update_idletasks()
+            canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
+            canvas.pack(fill='both', expand=True, side='left')
+            scroll_y.pack(fill='y', side='right')
+
+
+def rept7():
+    global nl
+    if nl==0:
+        rpt5.destroy()
+    admin_report()
+    
+def rept13():
+    global nl
+    if nl==0:
+        rpt5.destroy()
+    admin_report2()
+    
+def res5():
+    global zl
+    if zl==0:
+        rpt5.destroy()
+    admin_mainscreen()      
+   
+   
+def admin_reportok7():
+    cl=cd.get()
+    if cl==0:
+        messagebox.showerror("Error","No Values selected")
+    else:
+        yy=[[100,300],[300,600],[600,1000]]
+        dc=yy[cl-1]    
+        s="select * from busdetail where costpp>=%s and costpp<=%s"
+        val=(dc[0],dc[1])
+        cur.execute(s,val)
+        m=cur.fetchall()
+        n=cur.rowcount
+        mycon.commit()
+        if n==0:
+            messagebox.showerror("Error","No Buses Found For the Given Cost")
+        else:
+            global rpt7
+            rep2.destroy()
+            rpt7=Tk()
+            rpt7.title('Cost Report')
+            canvas = Canvas(rpt7)
+            scroll_y = Scrollbar(rpt7, orient="vertical",command=canvas.yview)
+            frame = Frame(canvas)
+            rpt7.config(bg="mintcream")
+            rpt7.geometry("1400x1050")
+            ph=PhotoImage(file=r"E:\cs proj\bg22.1.png")
+            la=Label(frame,image=ph)
+            la.image=ph
+            la.pack()
+            su=["Bus No","Driver Name","Type1","Type2","Mode","From","To","Timing","Amount","Seats"]
+            a=8
+            b=10
+            for j in su:
+                Label(frame,text=j,font=("Comic Sans MS",14,"bold")).place(x=a,y=b)
+                a+=133
+            yy=[[100,300],[300,600],[600,1000]]
+            dc=yy[cl-1]    
+            s="select * from busdetail where costpp>=%s and costpp<=%s"
+            val=(dc[0],dc[1])
+            cur.execute(s,val)
+            m=cur.fetchall()
+            n=cur.rowcount
+            mycon.commit()
+            d=60
+            for i in range(n):
+                Label(frame,text=str(m[i][0]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=10,y=d)
+                Label(frame,text=str(m[i][1]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=145,y=d)
+                Label(frame,text=str(m[i][2]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=280,y=d)
+                Label(frame,text=str(m[i][3]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=415,y=d)
+                Label(frame,text=str(m[i][4]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=550,y=d)
+                Label(frame,text=str(m[i][5]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=685,y=d)
+                Label(frame,text=str(m[i][6]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=820,y=d)
+                Label(frame,text=str(m[i][7]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=955,y=d)
+                Label(frame,text=str(m[i][8]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=1090,y=d)
+                Label(frame,text=str(m[i][9]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="maroon").place(x=1225,y=d)
+                d+=60
+        Button(frame,width=22,height=1,text="Go to Report Mainscreen",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="light yellow",activeforeground="indianred3",command=rept8).place(x=300,y=d+60)
+        Button(frame,width=10,height=1,text="Back",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="light yellow",activeforeground="indianred3",command=rept14).place(x=600,y=d+60)
+        Button(frame,width=22,height=1,text="Go to Admin Mainscreen",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="light yellow",activeforeground="indianred3",command=res6).place(x=800,y=d+60)
+        canvas.create_window(0, 0, anchor='nw', window=frame)
+        canvas.update_idletasks()
+        canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
+        canvas.pack(fill='both', expand=True, side='left')
+        scroll_y.pack(fill='y', side='right')
+    
+def rept8():
+    global nl
+    if nl==0:
+        rpt7.destroy()
+    admin_report()
+    
+def rept14():
+    global nl
+    if nl==0:
+        rpt7.destroy()
+    admin_report2()
+    
+def res6():
+    global zl
+    if zl==0:
+        rpt7.destroy()
+    admin_mainscreen()    
+
+
+def admin_showbus():
+    global asb
+    am.destroy()
+    asb=Tk()
+    asb.title('Bus List')
+    canvas = Canvas(asb)
+    scroll_y = Scrollbar(asb, orient="vertical",command=canvas.yview)
+    frame = Frame(canvas)
+    asb.config(bg="LemonChiffon2")
+    asb.geometry("1400x1050")
+    ph=PhotoImage(file=r"E:\cs proj\bg42.2.png")
+    la=Label(frame,image=ph)
+    la.image=ph
+    la.pack()
+    su=["Bus No","Travel Name","Type1","Type2","Mode","From","To","Timing","Amount","Seats"]
+    a=8
+    b=10
+    for j in su:
+        Label(frame,text=j,font=("Comic Sans MS",14,"bold"),bg='mintcream',fg="maroon").place(x=a,y=b)
+        a+=133
+    cur.execute("select * from busdetail")
+    m=cur.fetchall()
+    n=cur.rowcount
+    mycon.commit()
+    c=10
+    d=60
+    for i in range(n):
+        Label(frame,text=str(m[i][0]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="navyblue").place(x=10,y=d)
+        Label(frame,text=str(m[i][1]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="navyblue").place(x=145,y=d)
+        Label(frame,text=str(m[i][2]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="navyblue").place(x=280,y=d)
+        Label(frame,text=str(m[i][3]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="navyblue").place(x=415,y=d)
+        Label(frame,text=str(m[i][4]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="navyblue").place(x=550,y=d)
+        Label(frame,text=str(m[i][5]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="navyblue").place(x=685,y=d)
+        Label(frame,text=str(m[i][6]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="navyblue").place(x=820,y=d)
+        Label(frame,text=str(m[i][7]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="navyblue").place(x=955,y=d)
+        Label(frame,text=str(m[i][8]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="navyblue").place(x=1090,y=d)
+        Label(frame,text=str(m[i][9]),font=("Comic Sans MS",12,"bold"),bg='mintcream',fg="navyblue").place(x=1225,y=d)
+        d+=60
+    Button(frame,width=22,height=1,text="OK",font=("Comic Sans MS",15,"bold"),bg='mintcream',fg="maroon",activebackground="plum1",activeforeground="indianred3",command=res7).place(x=500,y=d+60)
+    canvas.create_window(0, 0, anchor='nw', window=frame)
+    canvas.update_idletasks()
+    canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
+    canvas.pack(fill='both', expand=True, side='left')
+    scroll_y.pack(fill='y', side='right')
+    
+def res7():
+    global zl
+    if zl==0:
+        asb.destroy()
+    admin_mainscreen()   
+
+
+def user_login():
+    global ul
+    global usernam,passwor
+    ul=Tk()
+    ul.config(bg="lemon chiffon")
+    ul.geometry("1400x1050")
+    ul.title("User Login")
+    ph=PhotoImage(file=r"E:\cs proj\bg8.1.png")
+    b=Label(image=ph)
+    b.image=ph
+    b.pack()
+    usernam = StringVar()
+    passwor= StringVar()
+    Label(ul,width=12,height=1,font=("Comic Sans MS",22,"bold"),bg="Pale Turquoise1",fg="aquamarine4", text="Login").place(x=450,y=50)
+    usernam_label=Label(ul,width=12,height=1,font=("Comic Sans MS",22,"bold"),bg="Pale Turquoise1",fg="aquamarine4", text="Username *").place(x=300,y=150)
+    usernam_entry= Entry(ul, textvariable=usernam,font=("Comic Sans MS",20,"bold"),bg="azure",fg="aquamarine4").place(x=550,y=150)
+    passwor_label=Label(ul,width=12,height=1,font=("Comic Sans MS",22,"bold"),bg="Pale Turquoise1",fg="aquamarine4", text="Password * ").place(x=300,y=250)
+    passwor_entry= Entry(ul, textvariable=passwor, show='*',font=("Comic Sans MS",20,"bold"),bg="azure",fg="aquamarine4").place(x=550,y=250)
+    Button(ul,width=10,height=1,text="Proceed",font=("Comic Sans MS",22,"bold"),bg="Pale Turquoise1",fg="aquamarine4",relief=GROOVE,bd=6,activebackground="light blue",activeforeground="red",command=user_loginproceed).place(x=600,y=350)
+    Button(ul,width=10,height=1,text="Back",font=("Comic Sans MS",22,"bold"),bg="Pale Turquoise1",fg="aquamarine4",relief=GROOVE,bd=6,activebackground="light blue",activeforeground="red",command=login2).place(x=400,y=350)
+
+
+def login2():
+    ul.destroy()
+    main()
+
+
+def user_loginproceed():
+    global tl
+    a=usernam.get()
+    b=passwor.get()
+    cur.execute("select username,password from user where username='{}' and password='{}'".format(a,b))
+    d=cur.fetchall()
+    mycon.commit()
+    if a=="" or b=="":
+        messagebox.showerror("Error","Enter all values!!")
+    elif len(d)==1:
+        if d[0][0]==a and d[0][1]==b:
+            messagebox.showinfo("Info","Login Successfull")
+            ul.destroy()
+            if tl==0:
+                tl=1
+            user_mainscreen()
+    else:
+        messagebox.showwarning("Warning","Incorrect Username or Password")
+            
+
+
+def user_register():
+    global us
+    global name,email,passwo,adhar,passwo1
+    us=Tk()
+    us.config(bg="lemon chiffon")
+    us.title("User Register")
+    us.geometry("1400x1050")
+    ph=PhotoImage(file=r"E:\cs proj\bg8.1.png")
+    b=Label(image=ph)
+    b.image=ph
+    b.pack()
+    name=StringVar()
+    email=StringVar()
+    passwo=StringVar()
+    passwo1=StringVar()
+    adhar=IntVar()
+    gender=IntVar()
+    Label(us,text="Sign Up",width=8,height=1,font=("Comic Sans MS",22,"bold"),bg="Pale Turquoise1",fg="aquamarine4").place(x=460,y=40)
+    name_label=Label(us, text="Name  ",width=7,height=1,font=("Comic Sans 
+MS",22,"bold"),bg="Pale Turquoise1",fg="aquamarine4").place(x=300,y=100)
+    name_entry = Entry(us, textvariable=name,font=("Comic Sans MS",20,"bold"),bg="mintcream",fg="aquamarine4").place(x=550,y=100)
+    email_label=Label(us, text="Email  ",width=10,height=1,font=("Comic Sans MS",22,"bold"),bg="Pale Turquoise1",fg="aquamarine4").place(x=300,y=170)
+    email_entry= Entry(us, textvariable=email,font=("Comic Sans MS",20,"bold"),bg="mintcream",fg="aquamarine4").place(x=550,y=170)
+    password_label=Label(us,text="Password ",width=12,height=1,font=("Comic Sans MS",22,"bold"),bg="Pale Turquoise1",fg="aquamarine4").place(x=300,y=240)
+    password_entry=Entry(us, textvariable=passwo,show="*",font=("Comic Sans MS",20,"bold"),bg="mintcream",fg="aquamarine4").place(x=550,y=240)
+    password1_label=Label(us,text="Confirm Password ",width=16,height=1,font=("Comic Sans MS",22,"bold"),bg="Pale Turquoise1",fg="aquamarine4").place(x=270,y=310)
+    password1_entry=Entry(us, textvariable=passwo1,show="*",font=("Comic Sans MS",20,"bold"),bg="mintcream",fg="aquamarine4").place(x=550,y=310)
+    adhar_label=Label(us,text="Aadhar No ",width=12,height=1,font=("Comic Sans MS",22,"bold"),bg="Pale Turquoise1",fg="aquamarine4").place(x=300,y=380)
+    adhar_entry=Entry(us, textvariable=adhar,font=("Comic Sans MS",20,"bold"),bg="azure",fg="aquamarine4").place(x=550,y=380)
+    Radiobutton(us,text="Male",font=("Comic Sans MS",22,"bold"),fg="aquamarine4",bg="Pale Turquoise1",activebackground="mintcream",activeforeground="violet",variable=gender,value=1).place(x=400,y=430)
+    Radiobutton(us,text="Female",font=("Comic Sans MS",22,"bold"),fg="aquamarine4",bg="Pale Turquoise1",activebackground="mintcream",activeforeground="violet",variable=gender,value=2).place(x=400,y=500)
+    Button(us,width=12,height=1,font=("Comic Sans MS",22,"bold"),bg="Pale Turquoise1",fg="aquamarine4",text="Proceed",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="violet",command=user_regproceed).place(x=650,y=575)
+    Button(us,width=12,height=1,font=("Comic Sans MS",22,"bold"),bg="Pale Turquoise1",fg="aquamarine4",text="Back",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="violet",command=register2).place(x=400,y=575)
+
+
+def register2():
+    us.destroy()
+    main()
+
+
+def user_regproceed():
+    global zl
+    a=name.get()
+    b=email.get()
+    c=passwo.get()
+    d=adhar.get()
+    e=passwo1.get()
+    cur.execute("select email from user")
+    f=cur.fetchall()
+    mycon.commit()
+    if a=="" or b=="" or c=="" or d==0:
+        messagebox.showerror("Error","Enter all values!!")
+    for i in f:
+        if i[0]==b:
+            messagebox.showerror("Error",'This User already exists')
+        elif c!=e:
+            messagebox.showerror("Error","Password not same as confirmed password")
+        else:
+            if zl==0:
+                zl=2
+            messagebox.showinfo("Info","Registration Successfull")
+            us.destroy()
+            user_mainscreen()
+
+
+def ret():
+    global tl
+    if tl==0:
+        ulp.destroy()
+        tl=1
+    user_mainscreen()
+
+
+def ret1():
+    global zl
+    if zl==0:
+        urp.destroy()
+    user_mainscreen()
+
+
+
+
+def rea():
+    global zl
+    if zl==0:
+        usp.destroy()
+    user_mainscreen()
+
+
+def rea1():
+    global tl
+    if tl==0:
+        uc.destroy()
+    user_mainscreen()
+
+
+def rea2():
+    global o1
+    if ol==0:
+        um.destroy()
+    user_mainscreen()
+
+
+def user_mainscreen():
+    global ub
+    ub=Tk()
+    ub.config(bg="azure")
+    ub.geometry("1400x1050")
+    ub.title("User Mainscreen")
+    ph=PhotoImage(file=r"E:\cs proj\main2.1.png")
+    a=Label(image=ph)
+    a.image=ph
+    a.pack()
+    frame=Frame(ub).pack()
+    menu=Menu(frame,bg="RoyalBlue3")
+    ub.config(menu=menu)
+    file=Menu(menu,activebackground="royal blue",activeforeground="PaleTurquoise1",font=("Comic Sans MS",16,"bold"))
+    menu.add_cascade(label="File",menu=file,activebackground="royal blue",activeforeground="PaleTurquoise1",font=("Comic Sans MS",16,"bold"))
+    file.add_command(label="Go to Mainscreen",command=menu1,activebackground="royal blue",activeforeground="PaleTurquoise1",font=("Comic Sans MS",16,"bold"))
+    file.add_command(label="Login",command=menu2,activebackground="royal blue",activeforeground="PaleTurquoise1",font=("Comic Sans MS",16,"bold"))
+    file.add_command(label="Register",command=menu3,activebackground="royal blue",activeforeground="PaleTurquoise1",font=("Comic Sans MS",16,"bold"))
+    file.add_separator()
+    Button(ub,width=15,height=1,font=("Comic Sans MS",18,"bold"),bg="PaleVioletRed1",fg="ivory2",text="Account",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="aquamarine4",command=profile).place(x=270,y=400)
+    Button(ub,width=15,height=1,font=("Comic Sans MS",18,"bold"),bg="PaleVioletRed1",fg="ivory2",text="Book a Bus",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="aquamarine4",command=users3).place(x=520,y=400)
+    Button(ub,width=18,height=1,font=("Comic Sans MS",18,"bold"),bg="PaleVioletRed1",fg="ivory2",text="Cancel a Booking",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="aquamarine4",command=usecancel).place(x=770,y=400)
+    Button(ub,width=18,height=1,font=("Comic Sans MS",18,"bold"),bg="PaleVioletRed1",fg="ivory2",text="Re-Schedule a Booking",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="aquamarine4",command=resch1).place(x=330,y=500)
+    Button(ub,width=18,height=1,font=("Comic Sans MS",18,"bold"),bg="PaleVioletRed1",fg="ivory2",text="Show ticket",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="aquamarine4",command=showtic1).place(x=620,y=500)
+
+
+def showtic1():
+    global ol,ml
+    if ml==1 and tl==0 and zl==0:
+        messagebox.showerror("Error","Login or Register First")
+    else:
+        ub.destroy()
+        showticket1()
+        
+def showtic2():
+    global ol
+    try:
+        a=sht.get()
+    except TclError:
+        messagebox.showerror("Error","Booking Id consist only of Digits ")
+    cur.execute("select * from booking")
+    b=cur.fetchall()
+    mycon.commit()
+    cur.execute("select status,busno from trips where bookno={}".format(a))
+    c=cur.fetchall()
+    mycon.commit()
+    if c==[]:
+        messagebox.showerror("Error","Invalid Booking ID")
+    else:
+        cur.execute("select * from busdetail where busno={}".format(c[0][1]))
+        d=cur.fetchall()
+        e=cur.rowcount
+        mycon.commit()
+        fh=[i[0] for i in b]
+        if a==0:
+            messagebox.showerror("Error","Enter Booking ID")
+        elif c[0][0] in 'cC':
+            messagebox.showerror("Error","This Booking has been Cancelled")
+            st.destroy()
+            showticket2()
+        elif e==0:
+            messagebox.showinfo("Information","This bus has been removed.Your refund will be processed in 4-7 business days")
+        else:
+            st.destroy()
+            showticket2()
+
+
+def showtic3():
+    global ol
+    if ol==0:
+        st.destroy()
+    user_mainscreen()
+
+
+def showticket1():
+    global st,sht
+    st=Tk()
+    st.geometry('1400x1050')
+    st.title('Show Ticket 1')
+    ph=PhotoImage(file=r"E:\cs proj\bg39.1.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.place(x=1,y=1)
+    sht=StringVar()
+    if tl==1:
+        k=usernam.get()
+        pw=passwor.get()
+    elif zl==2:
+        k=name.get()
+        pw=passwo.get()
+    cur.execute("select email from user where username='{}' and password='{}'".format(k,pw))
+    a=cur.fetchall()
+    mycon.commit()
+    cur.execute("select bookno from trips where username='{}' and email='{}'".format(k,a[0][0]))
+    b=cur.fetchall()
+    mycon.commit()
+    bookids=[i[0] for i in b]
+    Label(st,text="Enter Booking ID to Get Ticket",font=("Comic Sans MS",20,"bold")).place(x=300,y=50)
+    Label(st,text="Booking ID",font=("Comic Sans MS",20,"bold")).place(x=300,y=120)
+    ttk.Combobox(st,textvariable=sht,width=15,values=bookids,font=("Comic Sans MS",18,"bold")).place(x=500,y=120)
+    Button(st,text='OK',font=("Comic Sans MS",20,"bold"),command=showtic2).place(x=500,y=230)
+    Button(st,text='Back',font=("Comic Sans MS",20,"bold"),command=showtic3).place(x=400,y=230)
+
+
+def showticket2():
+    global st1
+    st1=Tk()
+    sht2=sht.get()
+    st1.geometry('1400x1050')
+    st1.title('Show Ticket 2')
+    canvas=Canvas(st1)
+    scroll_y = Scrollbar(st1, orient="vertical",command=canvas.yview)
+    frame=Frame(canvas)
+    ph=PhotoImage(file=r"E:\cs proj\bg23.2.png")
+    la=Label(frame,image=ph)
+    la.image=ph
+    la.pack()
+    ra=random.randint(1000,10000)
+    ran="VC-"+str(ra)
+    Label(frame,text="Invoice No",font=("Comic Sans MS",12,"bold")).place(x=20,y=150)
+    Label(frame,text=ran,font=("Comic Sans MS",12,"bold")).place(x=120,y=150)
+    now=datetime.datetime.now()
+    a=now.strftime("%Y-%m-%d %H:%M:%S")
+    cur.execute("select trdate,busno from trips where bookno={}".format(sht2))
+    da=cur.fetchall()
+    mycon.commit()
+    Label(frame,text="Booking date and time",font=("Comic Sans MS",12,"bold")).place(x=220,y=150)
+    Label(frame,text=a,font=("Comic Sans MS",12,"bold")).place(x=400,y=150)
+    Label(frame,text="Departure Date:",font=("Comic Sans MS",12,"bold")).place(x=600,y=150)
+    Label(frame,text=da[0][0],font=("Comic Sans MS",12,"bold")).place(x=750,y=150)
+    Label(frame,text="INVOICE",font=("Comic Sans MS",22,"bold")).place(x=950,y=150)
+    Label(frame,text="Bill To:",font=("Comic Sans MS",15,"bold")).place(x=20,y=190)
+    if tl==1:
+        k=usernam.get()
+        pw=passwor.get()
+    elif zl==2:
+        k=name.get()
+        pw=passwo.get()
+    cur.execute("select username,email,aadhar from user where username='{}' and password='{}'".format(k,pw))
+    deta=cur.fetchall()
+    mycon.commit()
+    des=deta[0][0]+"\n"+deta[0][1]+"\n"+str(deta[0][2])
+    Label(frame,font=("Comic Sans MS",15,"bold"),text=des).place(x=20,y=240)
+    Label(frame,text="Passenger(s)",font=("Comic Sans MS",15,"bold")).place(x=500,y=190)
+    cur.execute("select name,age,seatno from passenger where id={}".format(sht2))
+    mes=cur.fetchall()
+    no=cur.rowcount
+    b=230
+    Label(frame,text='Name',font=("Comic Sans MS",15,"bold")).place(x=500,y=b)
+    Label(frame,text='Age',font=("Comic Sans MS",15,"bold")).place(x=650,y=b)
+    Label(frame,text='Seat',font=("Comic Sans MS",15,"bold")).place(x=750,y=b)
+    c=500
+    d=280
+    for i in range(no):
+        Label(frame,text=str(mes[i][0]),font=("Comic Sans MS",13,"bold")).place(x=500,y=d)
+        Label(frame,text=str(mes[i][1]),font=("Comic Sans MS",13,"bold")).place(x=650,y=d)
+        Label(frame,text=str(mes[i][2]),font=("Comic Sans MS",13,"bold")).place(x=750,y=d)
+        d+=40
+    su=["Bus No","Type1","Type2","Mode","From","To","Timing"]
+    e=20
+    f=d+50
+    for j in su:
+        Label(frame,text=j,font=("Comic Sans MS",14,"bold")).place(x=e,y=f)
+        e+=150
+    g=da[0][1]
+    cur.execute("select busno,type1,type2,mode,froloc,toloc,timing,costpp from busdetail where busno={}".format(g))
+    m=cur.fetchall()
+    n=cur.rowcount
+    mycon.commit()
+    k=d+100
+    for i in range(n):
+        Label(frame,text=str(m[i][0]),font=("Comic Sans MS",14,"bold")).place(x=20,y=k)
+        Label(frame,text=str(m[i][1]),font=("Comic Sans MS",14,"bold")).place(x=170,y=k)
+        Label(frame,text=str(m[i][2]),font=("Comic Sans MS",14,"bold")).place(x=320,y=k)
+        Label(frame,text=str(m[i][3]),font=("Comic Sans MS",14,"bold")).place(x=470,y=k)
+        Label(frame,text=str(m[i][4]),font=("Comic Sans MS",14,"bold")).place(x=620,y=k)
+        Label(frame,text=str(m[i][5]),font=("Comic Sans MS",14,"bold")).place(x=770,y=k)
+        Label(frame,text=str(m[i][6]),font=("Comic Sans MS",14,"bold")).place(x=920,y=k)
+        k+=60
+    cur.execute("select costpp from busdetail where busno={}".format(g))
+    desi=cur.fetchall()
+    mycon.commit()
+    cur.execute("select * from passenger where id={}".format(sht2))
+    desig=cur.fetchall()
+    design=cur.rowcount
+    mycon.commit()
+    fincost=desi[0][0]*design
+    Label(frame,text="Ticket Fare",font=("Comic Sans MS",15,"bold")).place(x=20,y=d+160)
+    Label(frame,text=str(fincost),font=("Comic Sans MS",15,"bold")).place(x=150,y=d+160)
+    Label(frame,text="Tax(Including GST,Service Tax,etc)-18%",font=("Comic Sans MS",15,"bold")).place(x=20,y=d+210)
+    r=fincost*(18/100)
+    t=fincost+r
+    Label(frame,text=str(r),font=("Comic Sans MS",15,"bold")).place(x=450,y=d+210)
+    Label(frame,text="Total Fare",font=("Comic Sans MS",15,"bold")).place(x=20,y=d+260)
+    Label(frame,text=str(t),font=("Comic Sans MS",15,"bold")).place(x=150,y=d+260)
+    Label(frame,text="Health Facilities\nMask,Sanitizer,Emergency First Aid kit,\n fire extingiusher, frequent sanitization of all surfaces,\n other hygiene supplies , break glass system",font=("Comic Sans MS",12,"bold")).place(x=650,y=d+300)
+    Label(frame,text="Other Facilities\nWifi,safe and on time bus,Music system,\n TV, Water bottles, Blankets, Charging ports, Large leg room,\n frequent stops for restroom and other necessities, adjustable seats,\nGPS tracking,overhead light and AC",font=("Comic Sans MS",12,"bold")).place(x=650,y=d+160)
+    Label(frame,text="Booking Id",font=("Comic Sans MS",15,"bold")).place(x=250,y=d+260)
+    Label(frame,text=sht2,font=("Comic Sans MS",15,"bold")).place(x=400,y=d+260)
+    Button(frame,text="OK",font=("Comic Sans MS",15,"bold"),command=showtic4,bg='PaleGreen1',activebackground='SeaGreen1',relief=GROOVE).place(x=1100,y=380)
+    frame.pack()
+    canvas.create_window(0, 0, anchor='nw', window=frame)
+    canvas.update_idletasks()
+    canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
+    canvas.pack(fill='both', expand=True, side='left')
+    scroll_y.pack(fill='y', side='right')
+    
+def showtic4():
+    global ol
+    if ol==0:
+        st1.destroy()
+    user_mainscreen()
+    
+
+
+def users3():
+    global ol
+    if ol==0:
+        ub.destroy()
+    user_bookbus()
+
+
+def menu1():
+    ub.destroy()
+    main()
+
+
+def menu2():
+    ub.destroy()
+    user_login()
+
+
+def menu3():
+    ub.destroy()
+    user_register()
+
+
+def resch1():
+    global rl,ml
+    if ml==1 and tl==0 and zl==0:
+        messagebox.showerror("Error","Login or Register First")
+    else:
+        ub.destroy()
+        user_resc1()
+
+
+def user_resc1():
+    global rsc,rescd
+    rsc=Tk()
+    rsc.geometry("1400x1050")
+    rsc.title("Re-Schedule Booking 1")
+    rescd=IntVar()
+    ph=PhotoImage(file=r"E:\cs proj\bg36.2.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.pack()
+    if tl==1:
+        k=usernam.get()
+        pw=passwor.get()
+    elif zl==2:
+        k=name.get()
+        pw=passwo.get()
+    cur.execute("select email from user where username='{}' and password='{}'".format(k,pw))
+    a=cur.fetchall()
+    mycon.commit()
+    cur.execute("select bookno from trips where username='{}' and email='{}'".format(k,a[0][0]))
+    b=cur.fetchall()
+    mycon.commit()
+    bookids=[i[0] for i in b]
+    Label(rsc,text='Enter the Booking ID to Re-Schedule Your Booking',font=("Comic Sans MS",22,"bold"),bg="light pink",fg='medium violet red').place(x=150,y=50)
+    Label(rsc,text='Booking ID',font=("Comic Sans MS",22,"bold"),bg="light pink",fg='medium violet red').place(x=300,y=450)
+    ttk.Combobox(rsc,textvariable=rescd,width=15,values=bookids,font=("Comic Sans MS",18,"bold")).place(x=500,y=450)
+    Button(rsc,text="OK",font=("Comic Sans MS",20,"bold"),relief=GROOVE,bd=6,activebackground="light pink",activeforeground="medium violet red",command=resch3,bg="light pink",fg='medium violet red').place(x=400,y=500)
+    Button(rsc,text="Back",font=("Comic Sans MS",20,"bold"),relief=GROOVE,bd=6,activebackground="light pink",activeforeground="medium violet red",command=resch2,bg="light pink",fg='medium violet red').place(x=500,y=500)
+
+
+def resch2():
+    global ol
+    if ol==0:
+        rsc.destroy()
+    user_mainscreen()
+
+
+def resch3():
+    global rl
+    try:
+        a=rescd.get()
+    except TclError:
+        messagebox.showerror("Error","Booking Id consist only of Digits ")
+    cur.execute("select * from booking")
+    b=cur.fetchall()
+    mycon.commit()
+    cur.execute("select status,busno from trips where bookno='{}'".format(a))
+    c=cur.fetchall()
+    mycon.commit()
+    if c==[]:
+        messagebox.showerror("Error","Invalid Booking ID")
+    else:
+        cur.execute("select * from busdetail where busno='{}'".format(c[0][1]))
+        d=cur.fetchall()
+        e=cur.rowcount
+        mycon.commit()
+        cur.execute("select trdate from trips where bookno='{}'".format(a))
+        f=cur.fetchall()
+        mycon.commit()
+        cur.execute("select curdate()")
+        z=cur.fetchall()
+        mycon.commit()
+        fh=[i[0] for i in b]
+        if a==0:
+            messagebox.showerror("Error","Enter Booking ID")
+        elif c[0][0] in 'cC':
+             messagebox.showerror("Error","This Booking has been Cancelled")
+        elif e==0:
+             messagebox.showinfo("Information","This bus has been removed.Your refund will be processed in 4-7 business days")
+        elif f<z:
+            messagebox.showerror("Error","This Travel has been Expired")
+        else:
+            rsc.destroy()
+            user_resc2()
+
+
+
+
+def user_resc2():
+    a=rescd.get()
+    global rsc2,rescd2
+    rsc2=Tk()
+    rsc2.geometry("1400x1050")
+    rsc2.title("Re-Schedule Booking 2")
+    ph=PhotoImage(file=r"E:\cs proj\bg45.1.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.pack()
+    rescd2=StringVar()
+    Label(rsc2,text="Enter New Date",font=("Comic Sans MS",20,"bold"),bg='pale turquoise',fg='RoyalBlue2').place(x=300,y=150)
+    Entry(rsc2,textvariable=rescd2,font=("Comic Sans MS",20,"bold"),bg='pale turquoise',fg='RoyalBlue2').place(x=550,y=150)
+    Label(rsc2,text="write in format yyyy/mm/dd",font=("Comic Sans MS",14,"bold"),bg='pale turquoise',fg='RoyalBlue2').place(x=550,y=220)
+    Button(rsc2,text="OK",font=("Comic Sans MS",20,"bold"),relief=GROOVE,bd=6,activebackground="light pink",activeforeground="medium violet red",command=resch4,bg='pale turquoise',fg='RoyalBlue2').place(x=550,y=300)
+    Button(rsc2,text="Back",font=("Comic Sans MS",20,"bold"),relief=GROOVE,bd=6,activebackground="light pink",activeforeground="medium violet red",command=resch5,bg='pale turquoise',fg='RoyalBlue2').place(x=700,y=300)
+    
+def resch4():
+    global rl
+    a=rescd2.get()
+    if a=='':
+        messagebox.showerror("Error","Enter New Date")
+    else:
+        a=rescd2.get()
+        b=rescd.get()
+        cur.execute("update passenger set date='{}' where id={}".format(a,b))
+        mycon.commit()
+        cur.execute("update trips set trdate='{}' where bookno={}".format(a,b))
+        mycon.commit()
+        cur.execute("select * from trips where trdate>=curdate() and bookno={}".format(b))
+        c=cur.fetchall()
+        mycon.commit()
+        if c==[]:
+            messagebox.showerror('Error','Enter valid date')
+        else:
+            messagebox.showinfo("Info","Booking Re-Scheduled Successfully")
+            rsc2.destroy()
+            user_mainscreen()
+
+
+def resch5():
+    global ol
+    if ol==0:
+        rsc2.destroy()
+    user_resc1()
+
+
+def profile():
+    if ml==1 and tl==0 and zl==0:
+        messagebox.showwarning("Error","Login or Register first")
+    else:
+        ub.destroy()
+        user_showprofile()
+    
+def user_showprofile():
+    global usp,ka
+    if tl==1:
+        ka=usernam.get()
+        pw=passwor.get()
+    elif zl==2:
+        ka=name.get()
+        pw=passwo.get()       
+    usp=Tk()
+    usp.geometry("1400x1050")
+    usp.config(bg="lavender blush")
+    usp.title("Profile")
+    ph=PhotoImage(file=r"E:\cs proj\bg16.1.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.pack()
+    Label(usp,text="Username",font=("Comic Sans MS",22,"bold"),bg="lavender blush",fg="coral").place(x=20,y=30)
+    Label(usp,text="Password",font=("Comic Sans MS",22,"bold"),bg="lavender blush",fg="coral").place(x=180,y=30)
+    Label(usp,text="Email Id",font=("Comic Sans MS",22,"bold"),bg="lavender blush",fg="coral").place(x=520,y=30)
+    Label(usp,text="Aadhar No",font=("Comic Sans MS",22,"bold"),bg="lavender blush",fg="coral").place(x=350,y=30)
+    cur.execute("select * from user where username='{}' and password='{}'".format(ka,pw))
+    c=cur.fetchall()
+    mycon.commit()
+    for i in c:
+        Label(usp,text=i[0],font=("Comic Sans MS",22,"bold"),bg="lavender blush",fg="coral").place(x=20,y=100)
+        Label(usp,text=i[1],font=("Comic Sans MS",22,"bold"),bg="lavender blush",fg="coral").place(x=180,y=100)
+        Label(usp,text=i[2],font=("Comic Sans MS",22,"bold"),bg="lavender blush",fg="coral").place(x=520,y=100)
+        Label(usp,text=i[3],font=("Comic Sans MS",22,"bold"),bg="lavender blush",fg="coral").place(x=350,y=100)
+
+
+    Button(usp,font=("Comic Sans MS",20,"bold"),bg="lavender blush",fg="coral",text="OK",relief=GROOVE,bd=6,activebackground="light pink",activeforeground="medium violet red",command=rea).place(x=300,y=350)
+    Button(usp,font=("Comic Sans MS",20,"bold"),bg="lavender blush",fg="coral",text="Upcoming Trips",relief=GROOVE,bd=6,activebackground="light pink",activeforeground="medium violet red",command=data).place(x=100,y=200)
+    Button(usp,font=("Comic Sans MS",20,"bold"),bg="lavender blush",fg="coral",text="Past Trips",relief=GROOVE,bd=6,activebackground="light pink",activeforeground="medium violet red",command=data2).place(x=350,y=200)
+    Button(usp,font=("Comic Sans MS",20,"bold"),bg="lavender blush",fg="coral",text="Cancelled Trips",relief=GROOVE,bd=6,activebackground="light pink",activeforeground="medium violet red",command=data3).place(x=550,y=200)
+
+
+       
+def trip():
+    global bookid,busno,date,k
+    if tl==1:
+        h=usernam.get()
+        g=passwor.get()
+    elif zl==2:
+        h=name.get()
+        g=passwo.get()
+    cur.execute("select * from trips")
+    a=cur.fetchall()
+    b=cur.rowcount
+    e=date.get()
+    c=busno.get()
+    cur.execute("select * from passenger where id={}".format(bookid))
+    cur.fetchall()
+    f=cur.rowcount
+    cur.execute("select email from user where username='{}' and password='{}'".format(h,g))
+    i=cur.fetchall()
+    mycon.commit()
+    cur.execute("insert into trips values({},{},'{}','{}',{},'{}',{},'{}')".format(b+1,c,h,e,f,"A",bookid,i[0][0]))
+    mycon.commit()
+    payopt()
+    
+def data():
+    usp.destroy()
+    global tr,qe
+    tr=Tk()
+    tr.title("MY TRIPS")
+    tr.geometry("1400x1050")
+    ph=PhotoImage(file=r"E:\cs proj\bg43.1.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.place(x=1,y=1)
+    if tl==1:
+        k=usernam.get()
+        g=passwor.get()
+    elif zl==2:
+        k=name.get()
+        g=passwo.get()
+    cur.execute("select email from user where username='{}' and password='{}'".format(k,g))
+    q=cur.fetchall()
+    mycon.commit()
+    qe=q[0][0]
+    Label(tr,height=1,font=("Comic Sans MS",20,"bold"),text="UPCOMING TRIPS:",bg="LightGoldenRod1",fg='salmon').place(x=10,y=10)
+    cur.execute("select * from trips where trdate>=curdate() and status='a' and email='{}'".format(q[0][0]))
+    c=cur.fetchall()
+    n=cur.rowcount
+    mycon.commit()
+    t=100
+    su=["Bus no","Travel Date","No.of.Passengers","Status","Booking Id"]
+    a=8
+    b=50
+    if n==0:
+        Label(tr,height=1,font=("Comic Sans MS",22,"bold"),text="No Trips Available",bg="LightGoldenRod1",fg='salmon').place(x=50,y=50)
+    else:
+        for j in su:
+            Label(tr,text=j,font=("Comic Sans MS",14,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=a,y=b)
+            a+=175
+        for i in range(n):
+            Label(tr,text=str(c[i][1]),font=("Comic Sans MS",16,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=10,y=t)
+            Label(tr,text=str(c[i][3]),font=("Comic Sans MS",16,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=173,y=t)
+            Label(tr,text=str(c[i][4]),font=("Comic Sans MS",16,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=378,y=t)
+            Label(tr,text=str(c[i][5]),font=("Comic Sans MS",16,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=533,y=t)
+            Label(tr,text=str(c[i][6]),font=("Comic Sans MS",16,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=668,y=t)
+            t+=40
+    Button(tr,font=("Comic Sans MS",20,"bold"),bg="lavender blush",fg="coral",text="OK",relief=GROOVE,bd=6,activebackground="LightGoldenRod1",activeforeground="salmon",command=pro).place(x=350,y=380)
+    
+def pro():
+    global ol
+    if ol==0:
+        tr.destroy()
+    user_showprofile()
+    
+def data2():
+    usp.destroy()
+    global tr1
+    tr1=Tk()
+    tr1.title("PAST TRIPS")
+    tr1.geometry("1400x1050")
+    ph=PhotoImage(file=r"E:\cs proj\bg43.1.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.place(x=1,y=1)
+    if tl==1:
+        k=usernam.get()
+        g=passwor.get()
+    elif zl==2:
+        k=name.get()
+        g=passwo.get()
+    cur.execute("select email from user where username='{}' and password='{}'".format(k,g))
+    q=cur.fetchall()
+    mycon.commit()
+    qe=q[0][0]
+    Label(tr1,height=1,font=("Comic Sans MS",20,"bold"),text="PAST TRIPS",bg="LightGoldenRod1",fg='salmon').place(x=10,y=10)
+    cur.execute("select * from trips where trdate<curdate() and status='a' and email='{}'".format(qe))
+    y=cur.fetchall()
+    n=cur.rowcount
+    mycon.commit()
+    du=["Bus no","Travel Date","Nof.Passengers","Status","Booking Id"]
+    a=8
+    b=50
+    t=100
+    if n==0:
+        Label(tr1,height=1,font=("Comic Sans MS",22,"bold"),text="No Trips Available",bg="LightGoldenRod1",fg='salmon').place(x=50,y=50)
+    else:
+        for j in du:
+            Label(tr1,text=j,font=("Comic Sans MS",18,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=a,y=b)
+            a+=175
+        for i in range(n):
+            Label(tr1,text=str(y[i][1]),font=("Comic Sans MS",16,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=10,y=t)
+            Label(tr1,text=str(y[i][3]),font=("Comic Sans MS",16,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=173,y=t)
+            Label(tr1,text=str(y[i][4]),font=("Comic Sans MS",16,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=378,y=t)
+            Label(tr1,text=str(y[i][5]),font=("Comic Sans MS",16,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=533,y=t)
+            Label(tr1,text=str(y[i][6]),font=("Comic Sans MS",16,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=668,y=t)
+            t+=50
+    Button(tr1,font=("Comic Sans MS",20,"bold"),bg="lavender blush",fg="coral",text="OK",relief=GROOVE,bd=6,activebackground="LightGoldenRod1",activeforeground="salmon",command=pro1).place(x=350,y=380)
+
+
+def pro1():
+    global ol
+    if ol==0:
+        tr1.destroy()
+    user_showprofile()
+    
+def data3():
+    usp.destroy()
+    global tr2
+    tr2=Tk()
+    tr2.title("PAST TRIPS")
+    tr2.geometry("1400x1050")
+    ph=PhotoImage(file=r"E:\cs proj\bg43.1.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.place(x=1,y=1)
+    if tl==1:
+        k=usernam.get()
+        g=passwor.get()
+    elif zl==2:
+        k=name.get()
+        g=passwo.get()
+    cur.execute("select email from user where username='{}' and password='{}'".format(k,g))
+    q=cur.fetchall()
+    mycon.commit()
+    qe=q[0][0]
+    Label(tr2,height=1,font=("Comic Sans MS",20,"bold"),text="CANCELLED TRIPS:",bg="LightGoldenRod1",fg='salmon').place(x=10,y=10)
+    a=8
+    b=50
+    t=100
+    cur.execute("select * from trips where status='C' and email='{}'".format(qe))
+    z=cur.fetchall()
+    n=cur.rowcount
+    mycon.commit()
+    du=["Bus no","Travel Date","Nof.Passengers","Status","Booking Id"]
+    if n!=0:
+        for j in du:
+            Label(tr2,text=j,font=("Comic Sans MS",14,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=a,y=b)
+            a+=175
+        for i in range(n):
+            Label(tr2,text=str(z[i][1]),font=("Comic Sans MS",18,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=10,y=t)
+            Label(tr2,text=str(z[i][3]),font=("Comic Sans MS",18,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=173,y=t)
+            Label(tr2,text=str(z[i][4]),font=("Comic Sans MS",18,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=378,y=t)
+            Label(tr2,text=str(z[i][5]),font=("Comic Sans MS",18,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=533,y=t)
+            Label(tr2,text=str(z[i][6]),font=("Comic Sans MS",18,"bold"),bg="LightGoldenRod1",fg='salmon').place(x=668,y=t)
+            t+=50
+    else:
+        Label(tr2,height=1,font=("Comic Sans MS",22,"bold"),text="No Trips Cancelled",bg="LightGoldenRod1",fg='salmon').place(x=a,y=b)
+    Button(tr2,font=("Comic Sans MS",20,"bold"),bg="lavender blush",fg="coral",text="OK",relief=GROOVE,bd=6,activebackground="LightGoldenRod1",activeforeground="salmon",command=pro2).place(x=350,y=380)
+
+
+def pro2():
+    global ol
+    if ol==0:
+        tr2.destroy()
+    user_showprofile()
+
+
+def usecancel():
+    global rl,ml
+    if ml==1 and tl==0 and zl==0:
+        messagebox.showerror("Error","Login or Register First")
+    else:
+        ub.destroy()
+        user_cancel()  
+
+
+def user_cancel():
+    global uc
+    global bokid
+    uc=Tk()
+    uc.config(bg="snow2")
+    uc.geometry("1400x1050")
+    uc.title("User Cancel 1")
+    ph=PhotoImage(file=r"E:\cs proj\bg42.1.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.place(x=1,y=1)
+    bokid=IntVar()
+    date3=StringVar()
+    if tl==1:
+        k=usernam.get()
+        pw=passwor.get()
+    elif zl==2:
+        k=name.get()
+        pw=passwo.get()
+    cur.execute("select email from user where username='{}' and password='{}'".format(k,pw))
+    a=cur.fetchall()
+    mycon.commit()
+    cur.execute("select bookno from trips where username='{}' and email='{}'".format(k,a[0][0]))
+    b=cur.fetchall()
+    mycon.commit()
+    bookids=[i[0] for i in b]
+    Label(uc,height=1,font=("Comic Sans MS",22,"bold"),bg="LightGoldenRod1",fg="dark slate grey",text="Enter Booking ID to Cancel Your Booking").place(x=250,y=40)
+    Label(uc,height=1,font=("Comic Sans MS",22,"bold"),bg="LightGoldenRod1",fg="dark slate grey",text=" Booking ID").place(x=300,y=150)
+    ttk.Combobox(uc,textvariable=bokid,width=15,values=bookids,font=("Comic Sans MS",18,"bold")).place(x=500,y=150)
+    Button(uc,width=5,height=1,font=("Comic Sans MS",22,"bold"),bg="LightGoldenRod1",fg="dark slate grey",text="OK",relief=GROOVE,bd=6,activebackground="LightGoldenRod1",activeforeground="dark slate grey",command=reb).place(x=350,y=250)
+    Button(uc,width=5,height=1,font=("Comic Sans MS",22,"bold"),bg="LightGoldenRod1",fg="dark slate grey",text="Back",relief=GROOVE,bd=6,activebackground="LightGoldenRod1",activeforeground="dark slate grey",command=reb1).place(x=500,y=250)
+
+
+def reb():
+    global rl
+    try:
+        al=bokid.get()
+    except TclError:
+        messagebox.showerror("Error","Booking Id consist only of Digits ")
+    cur.execute("select bookno from trips")
+    b=cur.fetchall()
+    mycon.commit()
+    cur.execute("select trdate from trips where bookno={}".format(al))
+    f=cur.fetchall()
+    mycon.commit()
+    cur.execute("select curdate()")
+    z=cur.fetchall()
+    mycon.commit()
+    cur.execute("select status from trips where bookno={}".format(al))
+    x=cur.fetchall()
+    mycon.commit()
+    for i in b:
+        sl.append(i[0])
+    if al not in sl:
+        messagebox.showerror("Error","No such Booking ID found")    
+    elif f<z:
+        messagebox.showerror("Error","This Travel has been Expired")
+    elif x[0][0] in 'cC':
+        messagebox.showerror("Error",'This Travel has already cancelled')
+    elif rl==0:
+        uc.destroy()
+        user_cancelok()
+
+
+def reb1():
+    global ol
+    if ol==0:
+        uc.destroy()
+    user_mainscreen()
+
+
+def user_cancelok():
+    a=bokid.get()
+    global uco,usname
+    uco=Tk()
+    uco.config(bg="linen")
+    uco.geometry("1400x1050")
+    uco.title("User Cancel 2")
+    ph=PhotoImage(file=r"E:\cs proj\bg27.1.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.pack()
+    usname=StringVar()
+    me=["Name","Age",'Seat']
+    s=300
+    Label(uco,text="Passengers found in the ID",font=("Comic Sans MS",22,"bold"),bg="linen").place(x=200,y=30)
+    for i in me:
+        Label(uco,text=i,font=("Comic Sans MS",20,"bold"),bg="linen").place(x=s,y=100)
+        s+=150
+    t=160
+    cur.execute("select name,age,seatno from passenger where id={} and status='A'".format(a))
+    c=cur.fetchall()
+    d=cur.rowcount
+    mycon.commit()
+    for i in range(d):
+        Label(uco,text=str(c[i][0]),font=("Comic Sans MS",18,"bold"),bg="linen").place(x=300,y=t)
+        Label(uco,text=str(c[i][1]),font=("Comic Sans MS",18,"bold"),bg="linen").place(x=450,y=t)
+        Label(uco,text=str(c[i][2]),font=("Comic Sans MS",18,"bold"),bg="linen").place(x=600,y=t)
+        t+=60
+    Label(uco,text="Enter name of passengers to cancel",font=("Comic Sans MS",22,"bold"),bg="linen",fg="dark slate grey").place(x=140,y=t+80)
+    Entry(uco,textvariable=usname,font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="dark slate grey").place(x=700,y=t+80)
+    Button(uco,width=20,height=1,font=("Comic Sans MS",22,"bold"),bg="LightPink1",fg="dark slate grey",text="Confirm Cancellation",relief=GROOVE,bd=6,activebackground="LightGoldenRod1",activeforeground="dark slate grey",command=user_cancelconfirm).place(x=500,y=t+140)
+    Button(uco,height=1,font=("Comic Sans MS",22,"bold"),bg="LightPink1",fg="dark slate grey",text="Back",relief=GROOVE,bd=6,activebackground="LightGoldenRod1",activeforeground="dark slate grey",command=cancel).place(x=300,y=t+140)
+    mess="This Cancellation will cost you Rs.100 per ticket"
+    message=Label(uco,text=mess,font=("Comic Sans MS",20,"bold"))
+    message.config(bg="IndianRed1")
+    message.place(x=250,y=t+230)
+        
+def cancel():
+    global ol
+    if ol==0:
+        uco.destroy()
+    user_cancel()    
+    
+def user_cancelconfirm():
+    a=usname.get()
+    if a=='':
+        messagebox.showerror("Error","Enter the name of Passengers to Cancel")
+    else:
+        c=bokid.get()
+        e=0
+        cur.execute("select busno from passenger where id={}".format(c))
+        f=cur.fetchall()
+        mycon.commit()
+        if "," in a:
+            busss=a.split(",")
+            for i in busss:
+                e+=1
+                cur.execute("update passenger set status='C' where id={} and name='{}'".format(c,i))
+                mycon.commit()
+        else:
+            e+=1
+            cur.execute("update passenger set status='C' where id={} and name='{}'".format(c,a))
+            mycon.commit()
+            cur.execute("update passenger set seatno='NULL' where id='{}' and name='{}'".format(c,a))
+            mycon.commit()
+    cur.execute("select status from passenger where id={}".format(c))
+    hy=cur.fetchall()
+    mycon.commit()
+    hy1=[i[0] for i in hy]
+    if "A" not in hy1:
+        cur.execute("update trips set status='C' where bookno={}".format(c))
+        mycon.commit()
+    cur.execute("select seats from busdetail where busno={}".format(f[0][0]))
+    g=cur.fetchall()
+    mycon.commit()
+    h=g[0][0]+e
+    cur.execute("update busdetail set seats={} where busno={}".format(h,f[0][0]))
+    mycon.commit()
+    messagebox.showinfo("Info","Your Booking has been Successfully Cancelled!.Your refund will be processed in \n4-7 bussiness days on your debit/credit card used.")
+    uco.destroy()
+    user_mainscreen()
+
+
+def reb2():
+    global ol
+    if ol==0:
+        ucc.destroy()
+    user_mainscreen()
+
+
+def user_bookbus():
+    global um
+    global ca,cb,cd,ce,cf,cg,ch,cs,frm
+    um=Tk()
+    um.config(bg='mintcream')
+    um.geometry("1400x1050")
+    um.title("Book A Bus")
+    ca=StringVar()
+    cb=StringVar()
+    cd=IntVar()
+    ce=IntVar()
+    cf=IntVar()
+    cg=IntVar()
+    ch=IntVar()
+    pho=PhotoImage(file=r"E:\cs proj\bg1.png")
+    lab=Label(image=pho)
+    lab.image=pho
+    lab.pack()
+    cur.execute("select arriv,dept from places")
+    pl=cur.fetchall()
+    mycon.commit()
+    pl1,pl2=[],[]
+    for i in pl:
+        if i[0]!='NULL':
+            pl1.append(i[0])
+        if i[1]!='NULL':
+            pl2.append(i[1])
+    
+    Label(um,text="From",font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="salmon").place(x=30,y=30)
+    frm=ttk.Combobox(um,textvariable=ca,width=10,font=("Comic Sans MS",18,"bold"))
+    frm['values']=pl1
+    frm.place(x=10,y=100)
+    frm.current(0)
+
+
+    Label(um,text="To",font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="salmon").place(x=210,y=30)
+    top=ttk.Combobox(um,textvariable=cb,width=10,font=("Comic Sans MS",18,"bold"))
+    top['values']=pl2
+    top.place(x=205,y=100)
+    top.current(0)
+    
+    Label(um,text="Price Range",font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="salmon").place(x=380,y=30)
+    ad=Radiobutton(um,bg='mintcream',fg="salmon",font=("Comic Sans MS",18,"bold"),text="100-300",value=1,variable=cd).place(x=380,y=80)
+    ae=Radiobutton(um,bg='mintcream',fg="salmon",font=("Comic Sans MS",18,"bold"),text="300-600",value=2,variable=cd).place(x=380,y=130)
+    af=Radiobutton(um,bg='mintcream',fg="salmon",font=("Comic Sans MS",18,"bold"),text="600-1000",value=3,variable=cd).place(x=380,y=180)
+   
+    Label(um,text="Mode",font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="salmon").place(x=560,y=30)
+    ah=Radiobutton(um,bg='mintcream',fg="salmon",font=("Comic Sans MS",18,"bold"),text="Sleeper",value=1,variable=ce).place(x=560,y=80)
+    ai=Radiobutton(um,bg='mintcream',fg="salmon",font=("Comic Sans MS",18,"bold"),text="Non-Sleeper",value=2,variable=ce).place(x=560,y=130)
+   
+    Label(um,text="Type 1",font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="salmon").place(x=740,y=30)
+    al=Radiobutton(um,bg='mintcream',fg="salmon",font=("Comic Sans MS",18,"bold"),text="AC",value=1,variable=cf).place(x=740,y=80)
+    am=Radiobutton(um,bg='mintcream',fg="salmon",font=("Comic Sans MS",18,"bold"),text="Non-AC",value=2,variable=cf).place(x=740,y=130)
+   
+    Label(um,text="Type 2",font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="salmon").place(x=880,y=30)
+    ap=Radiobutton(um,bg='mintcream',fg="salmon",font=("Comic Sans MS",18,"bold"),text="Ordinary",value=1,variable=cg).place(x=880,y=80)
+    aq=Radiobutton(um,bg='mintcream',fg="salmon",font=("Comic Sans MS",18,"bold"),text="Deluxe",value=2,variable=cg).place(x=880,y=130)
+    ar=Radiobutton(um,bg='mintcream',fg="salmon",font=("Comic Sans MS",18,"bold"),text="Super Deluxe",value=3,variable=cg).place(x=880,y=180)
+   
+    Label(um,text="Preferred Timing",font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="salmon").place(x=1020,y=30)
+    av=Radiobutton(um,bg='mintcream',fg="salmon",font=("Comic Sans MS",18,"bold"),text="1hrs-5hrs",value=1,variable=ch).place(x=1065,y=80)
+    av=Radiobutton(um,bg='mintcream',fg="salmon",font=("Comic Sans MS",18,"bold"),text="6hrs-12hrs",value=2,variable=ch).place(x=1065,y=130)
+    aw=Radiobutton(um,bg='mintcream',fg="salmon",font=("Comic Sans MS",18,"bold"),text="13hrs-18hrs",value=3,variable=ch).place(x=1065,y=180)
+    ax=Radiobutton(um,bg='mintcream',fg="salmon",font=("Comic Sans MS",18,"bold"),text="19hrs-24hrs",value=4,variable=ch).place(x=1065,y=230)
+   
+    Button(um,width=5,height=1,font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="salmon",text="OK",relief=GROOVE,bd=6,activebackground="LightGoldenRod1",activeforeground="dark slate grey",command=users1).place(x=980,y=500)
+    Button(um,width=5,height=1,font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="salmon",text="Back",relief=GROOVE,bd=6,activebackground="LightGoldenRod1",activeforeground="dark slate grey",command=rea2).place(x=870,y=500)
+
+
+def users1():
+    global ol
+    ci=ca.get()
+    cj=cb.get()
+    ck=cd.get()
+    cl=ce.get()
+    cm=cf.get()
+    cn=cg.get()
+    co=ch.get()
+   
+    yy=[[100,300],[300,600],[600,1000]]
+    dc=yy[ck-1]
+   
+    aj=["sleeper","non-sleeper"]
+    de=aj[cl-1]
+   
+    an=["ac","non=ac"]
+    df=an[cm-1]
+   
+    at=["ordinary","deluxe","super deluxe"]
+    dg=at[cn-1]
+   
+    ay=[[1,5],[6,12],[13,18],[19,24]]
+    dh=ay[co-1]
+    s="select * from busdetail where froloc=%s and toloc=%s and costpp>=%s and costpp<=%s and mode=%s and type1=%s and type2=%s and timing>=%s and timing<=%s"
+    val=(ci,cj,dc[0],dc[1],de,df,dg,dh[0],dh[1])
+    cur.execute(s,val)
+    m=cur.fetchall()
+    n=cur.rowcount
+    mycon.commit()
+    if ci==0 or cj==0 or ck==0 or cl==0 or cm==0 or cn==0 or co==0:
+        messagebox.showwarning("Warning","Select all values")
+    elif ci==cj:
+        messagebox.showwarning("Warning","From Location & To Location cannot be same")
+    elif len(m)==0:
+        messagebox.showinfo("Information","Sorry no buses available")
+    else:
+        um.destroy()
+        showbuslist()
+
+
+def showbuslist():
+    ci=ca.get()
+    cj=cb.get()
+    ck=cd.get()
+    cl=ce.get()
+    cm=cf.get()
+    cn=cg.get()
+    co=ch.get()
+   
+    yy=[[100,300],[300,600],[600,1000]]
+    dc=yy[ck-1]
+   
+    aj=["sleeper","non-sleeper"]
+    de=aj[cl-1]
+   
+    an=["ac","non=ac"]
+    df=an[cm-1]
+   
+    at=["ordinary","deluxe","super deluxe"]
+    dg=at[cn-1]
+   
+    ay=[[1,5],[6,12],[13,18],[19,24]]
+    dh=ay[co-1]
+   
+    ba=[dc,de,df,dg,dh]
+    s="select * from busdetail where froloc=%s and toloc=%s and costpp>=%s and costpp<=%s and mode=%s and type1=%s and type2=%s and timing>=%s and timing<=%s"
+    val=(ci,cj,dc[0],dc[1],de,df,dg,dh[0],dh[1])
+    cur.execute(s,val)
+    m=cur.fetchall()
+    n=cur.rowcount
+    mycon.commit()
+    global ubb
+    ubb=Tk()
+    ubb.config(bg="mintcream")
+    ubb.geometry("1400x1050")
+    ubb.title('Buslist')
+    canvas = Canvas(ubb)
+    scroll_y = Scrollbar(ubb, orient="vertical",command=canvas.yview)
+    frame = Frame(canvas)
+    ph=PhotoImage(file=r"E:\cs proj\bg9.1.png")
+    la=Label(frame,image=ph)
+    la.image=ph
+    la.pack()
+    c=["Bus No","Travel","Type1","Type2","Mode","From","To","Timing","Amount","Seats"]
+    a=10
+    b=10
+    for i in c:
+        Label(frame,text=i,font=("Comic Sans MS",16,"bold"),bg="mintcream",fg="cadet blue").place(x=a,y=b)
+        a+=130
+    d=60
+    for i in range(n):
+        Label(frame,text=str(m[i][0]),font=("Comic Sans MS",16,"bold"),bg="mintcream",fg="cadet blue").place(x=10,y=d)
+        Label(frame,text=str(m[i][1]),font=("Comic Sans MS",16,"bold"),bg="mintcream",fg="cadet blue").place(x=140,y=d)
+        Label(frame,text=str(m[i][2]),font=("Comic Sans MS",16,"bold"),bg="mintcream",fg="cadet blue").place(x=275,y=d)
+        Label(frame,text=str(m[i][3]),font=("Comic Sans MS",16,"bold"),bg="mintcream",fg="cadet blue").place(x=410,y=d)
+        Label(frame,text=str(m[i][4]),font=("Comic Sans MS",16,"bold"),bg="mintcream",fg="cadet blue").place(x=545,y=d)
+        Label(frame,text=str(m[i][5]),font=("Comic Sans MS",16,"bold"),bg="mintcream",fg="cadet blue").place(x=680,y=d)
+        Label(frame,text=str(m[i][6]),font=("Comic Sans MS",16,"bold"),bg="mintcream",fg="cadet blue").place(x=815,y=d)
+        Label(frame,text=str(m[i][7]),font=("Comic Sans MS",16,"bold"),bg="mintcream",fg="cadet blue").place(x=950,y=d)
+        Label(frame,text=str(m[i][8]),font=("Comic Sans MS",16,"bold"),bg="mintcream",fg="cadet blue").place(x=1085,y=d)
+        Label(frame,text=str(m[i][9]),font=("Comic Sans MS",16,"bold"),bg="mintcream",fg="cadet blue").place(x=1180,y=d)
+        d+=60
+    Button(frame,text="OK",command=user_ok3,font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="maroon",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="cadet blue").place(x=550,y=d+60)
+    Button(frame,text="Back",command=users2,font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="maroon",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="cadet blue").place(x=400,y=d+60)
+    canvas.create_window(0, 0, anchor='nw', window=frame)
+    canvas.update_idletasks()
+    canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
+    canvas.pack(fill='both', expand=True, side='left')
+    scroll_y.pack(fill='y', side='right')
+    
+
+
+def users2():
+    global ol
+    if ol==0:
+        ubb.destroy()
+    user_bookbus()
+
+
+def user_ok3():
+    if ml==1 and tl==0 and zl==0:
+        messagebox.showerror("Error","Login or Register First")
+        ubb.destroy()
+        main()
+    else:
+        ubb.destroy()
+        user_ok()
+
+
+       
+def user_ok():
+    global use,busno,sea,date
+    use=Tk()
+    use.config(bg="mintcream")
+    ph=PhotoImage(file=r"E:\cs proj\bg9.1.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.pack()
+    use.title("Details")
+    use.geometry("1400x1050")
+    busno=StringVar()
+    sea=IntVar()
+    date=StringVar()
+    Label(use,font=("Comic Sans MS",22,"bold"),width=25,height=1,bg="mintcream",fg="cadet blue",text="Enter bus number to confirm").place(x=200,y=70)
+    bus_entry=Entry(use,textvariable=busno,font=("Comic Sans MS",20,"bold"),bg="azure",fg="cadet blue").place(x=700,y=70)
+    Label(use,font=("Comic Sans MS",22,"bold"),width=25,height=1,bg="mintcream",fg="cadet blue",text="Enter the No.of Seats").place(x=200,y=140)
+    sea_entry=Entry(use,textvariable=sea,font=("Comic Sans MS",20,"bold"),bg="azure",fg="cadet blue").place(x=700,y=140)
+    Label(use,font=("Comic Sans MS",22,"bold"),width=25,height=1,bg="mintcream",fg="cadet blue",text="Enter preffered date").place(x=200,y=210)
+    date_entry=Entry(use,textvariable=date,font=("Comic Sans MS",20,"bold"),bg="azure",fg="cadet blue").place(x=700,y=210)
+    Label(use,text="write in format yyyy/mm/dd",font=("Comic Sans MS",14,"bold"),bg="mintcream",fg="cadet blue").place(x=700,y=280)
+    Button(use,width=10,height=1,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="salmon",text="Proceed",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="cadet blue",command=user_ok2).place(x=650,y=350)
+    Button(use,width=10,height=1,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="salmon",text="Back",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="cadet blue",command=userp2).place(x=450,y=350)
+   
+def user_ok2():
+    global bookid
+    a=busno.get()
+    b=sea.get()
+    c=date.get()
+    cur.execute("select bookid from booking")
+    tt=cur.fetchall()
+    for i in tt:
+        sk.append(i[0])
+    for i in sj:
+        if i not in sk:
+            bookid=i
+            break
+    cur.execute("insert into booking values({},'{}')".format(bookid,c))
+    mycon.commit()
+    cur.execute("select * from booking where dot>=curdate() and bookid={}".format(bookid))
+    d=cur.fetchall()
+    mycon.commit()
+    cur.execute("select * from passenger where busno={} and date='{}'".format(a,c))
+    e=cur.fetchall()
+    f=cur.rowcount
+    mycon.commit()
+    cur.execute("select seats from busdetail where busno={}".format(a))
+    g=cur.fetchall()
+    mycon.commit()
+    h=f+b
+    if a=="" or b==0 or c=="":
+        messagebox.showwarning("Warning","Enter all values")
+    elif h>g[0][0]:
+        messagebox.showerror('Error','Sorry...the bus is full')
+        use.destroy()
+        user_bookbus()
+    elif d==[]:
+        messagebox.showerror('Error','Enter valid date')
+    else:
+        userp()
+        
+def userp():
+    global ol
+    if ol==0:
+        use.destroy()
+    user_passenger()
+
+
+def userp2():
+    global ol
+    if ol==0:
+        use.destroy()
+    showbuslist()
+    
+def user_passenger():
+    global up
+    up=Tk()
+    up.config(bg="floral white")
+    up.geometry("1400x1050")
+    up.title("Passenger Details")
+    ph=PhotoImage(file=r"E:\cs proj\main3.2.png")
+    lab=Label(image=ph)
+    lab.image=ph
+    lab.pack()
+    Button(up,width=15,height=1,font=("Comic Sans MS",20,"bold"),bg="sky blue",fg="chocolate1",text="Add Passsenger",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="cadet blue",command=user_add).place(x=800,y=30)
+    Button(up,width=15,height=1,font=("Comic Sans MS",20,"bold"),bg="sky blue",fg="chocolate1",text="Modify Passenger",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="cadet blue",command=user_modify).place(x=800,y=170)
+    Button(up,width=15,height=1,font=("Comic Sans MS",20,"bold"),bg="sky blue",fg="chocolate1",text="Remove Passenger",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="cadet blue",command=user_remove).place(x=800,y=310)
+    Button(up,width=15,height=1,font=("Comic Sans MS",20,"bold"),bg="sky blue",fg="chocolate1",text="Proceed",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="cadet blue",command=user_passproceed).place(x=800,y=450)
+    Button(up,width=15,height=1,font=("Comic Sans MS",20,"bold"),bg="sky blue",fg="chocolate1",text="Back",relief=GROOVE,bd=6,activebackground="mintcream",activeforeground="cadet blue",command=userp3).place(x=800,y=590)
+
+
+def userp3():
+    global ol
+    if ol==0:
+        up.destroy()
+    user_ok()
+
+
+   
+def user_add():
+    global ua,gen
+    up.destroy()
+    ua=Tk()
+    ua.config(bg="papaya whip")
+    ua.title('Add Passenger')
+    ph=PhotoImage(file=r"E:\cs proj\bg5.1.png")
+    b=Label(image=ph)
+    b.image=ph
+    b.pack()
+    global a,nam,ag
+    ua.geometry("1400x1050")
+    nam=StringVar()
+    ag=IntVar()
+    gen=IntVar()
+    Label(ua,height=1,font=("Comic Sans MS",22,"bold"),bg="papaya whip",fg="gold",text="Enter The Details Of Passengers").place(x=400,y=10)
+    Label(ua,width=10,height=1,font=("Comic Sans MS",22,"bold"),bg="papaya whip",fg="gold",text="Name").place(x=350,y=100)
+    name_entry=Entry(ua,textvariable=nam,font=("Comic Sans MS",20,"bold"),bg="papaya whip",fg="gold").place(x=600,y=100)
+    Label(ua,width=10,height=1,font=("Comic Sans MS",22,"bold"),bg="papaya whip",fg="gold",text="Age").place(x=350,y=200)
+    age_entry=Entry(ua,textvariable=ag,font=("Comic Sans MS",20,"bold"),bg="papaya whip",fg="gold").place(x=600,y=200)
+    Radiobutton(ua,font=("Comic Sans MS",22,"bold"),bg="papaya whip",fg="gold",activebackground="papaya whip",activeforeground="gold",text="Male",variable=gen,value=1).place(x=550,y=300)
+    Radiobutton(ua,font=("Comic Sans MS",22,"bold"),bg="papaya whip",fg="gold",activebackground="papaya whip",activeforeground="gold",text="Female",variable=gen,value=2).place(x=550,y=380)
+    Button(ua,text="OK",font=("Comic Sans MS",20,"bold"),bg="papaya whip",fg="gold",relief=GROOVE,bd=6,activebackground="papaya whip",activeforeground="gold",command=user_addok).place(x=600,y=450)
+    Button(ua,text="back",font=("Comic Sans MS",20,"bold"),bg="papaya whip",fg="gold",relief=GROOVE,bd=6,activebackground="papaya whip",activeforeground="gold",command=userpass).place(x=800,y=450)
+
+
+def userpass():
+    global ml
+    if ml==0:
+        ua.destroy()
+    user_passenger()
+    
+def user_addok():
+    global j
+    a=busno.get()
+    b=date.get()
+    m=nam.get()
+    n=ag.get()
+    if m=="" or n==0:
+        messagebox.showwarning("Warning","Enter all values")
+    else:
+        cur.execute("select seatno,seatno1,id,name,age from passenger where busno={} and date='{}'".format(a,b))
+        c=cur.fetchall()
+        d=cur.rowcount
+        mycon.commit()
+        if d==0:
+            l=busno.get()
+            p=date.get()
+            cur.execute('select max(sno) from passenger')
+            k=cur.fetchall()
+            mycon.commit()
+            ka=k[0][0]+1
+            if tl==1:
+                kl=usernam.get()
+                pw=passwor.get()
+            elif zl==2:
+                kl=name.get()
+                pw=passwo.get()
+            cur.execute("select aadhar from user where username='{}' and password='{}'".format(kl,pw))
+            des=cur.fetchall()
+            mycon.commit()
+            cur.execute("insert into passenger values({},{},{},'{}',{},'{}','{}',{},'{}','{}')".format(ka,a,bookid,m,n,p,'A',des[0][0],'A1','A1'))
+            messagebox.showinfo("Info","Passenger Added")
+            ua.destroy()
+            user_passenger()
+            mycon.commit()
+        else:    
+            l1=[i[0] for i in c]
+            print(l1,c)
+            for i in l1:
+                if i=='NULL':
+                    l2=l1.index(i)
+                    break
+                else:
+                    l2='a'
+            for sd in range(len(l1)-1,0,-1):
+                if l1[sd]=='0':
+                    l3=sd
+                    break
+                else:
+                    l3='a'
+            if l2!='a':
+                j=c[l2][1]
+                cur.execute("update passenger set seatno=0 where id={} and name='{}' and age={}".format(c[l2][2],c[l2][3],c[l2][4]))
+                mycon.commit()
+            else:
+                d=d-(l1.count('0'))
+                if d%5==4:
+                    e=65 
+                    f=d//5
+                    g=e+f
+                    h=d+2
+                    j=chr(g)+str(5)
+                else:
+                    e=65 
+                    f=d//5
+                    g=e+f
+                    h=d+1
+                    j=chr(g)+str(h%5)
+            l=busno.get()
+            p=date.get()
+            cur.execute('select max(sno) from passenger')
+            k=cur.fetchall()
+            mycon.commit()
+            ka=k[0][0]+1
+            if tl==1:
+                kl=usernam.get()
+                pw=passwor.get()
+            elif zl==2:
+                kl=name.get()
+                pw=passwo.get()
+            cur.execute("select aadhar from user where username='{}' and password='{}'".format(kl,pw))
+            des=cur.fetchall()
+            mycon.commit()
+            cur.execute("insert into passenger values({},{},{},'{}',{},'{}','{}',{},'{}','{}')".format(ka,a,bookid,m,n,p,'A',des[0][0],j,j))
+            messagebox.showinfo("Info","Passenger Added")
+            ua.destroy()
+            user_passenger()
+            mycon.commit()
+
+
+def user_modify():
+    cur.execute("select id from passenger")
+    a=cur.fetchall()
+    mycon.commit()
+    for i in a:
+        n.append(i[0])
+    if bookid not in n:
+        messagebox.showwarning("Warning","Add a passenger to modify")
+    else:
+        global umo
+        up.destroy()
+        umo=Tk()
+        umo.config(bg="papaya whip")
+        umo.title("Modify Passenger")
+        ph=PhotoImage(file=r"E:\cs proj\bg5.1.png")
+        b=Label(image=ph)
+        b.image=ph
+        b.pack()
+        global na,sp
+        umo.geometry("1400x1050")
+        na=StringVar()
+        sp=IntVar()
+        cur.execute("select name from passenger where id={}".format(bookid))
+        m=cur.fetchall()
+        mycon.commit()
+        Label(umo,text="Names\nAvailable",font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="gold").place(x=150,y=100)
+        l=200
+        for i in m:
+            Label(umo,text=i[0],font=("Comic Sans MS",18,"bold"),bg="misty rose",fg="gold").place(x=150,y=l)
+            l+=50
+        Label(umo,width=25,height=1,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="gold",text="Enter which name to modify").place(x=400,y=100)
+        na_entry=Entry(umo,textvariable=na,font=("Comic Sans MS",20,"bold"),bg="papaya whip",fg="gold").place(x=900,y=100)
+        Label(umo,width=20,height=1,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="gold",text="Enter age to modify").place(x=400,y=200)
+        ag_entry=Entry(umo,textvariable=sp,font=("Comic Sans MS",20,"bold"),bg="papaya whip",fg="gold").place(x=900,y=200)
+        Button(umo,text="Ok",font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="gold",relief=GROOVE,bd=6,activebackground="papaya whip",activeforeground="black",command=user_modifyok).place(x=700,y=300)
+        Button(umo,text="back",font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="gold",relief=GROOVE,bd=6,activebackground="papaya whip",activeforeground="black",command=userpass2).place(x=900,y=300)
+        
+def userpass2():
+    global ml
+    if ml==0:
+        umo.destroy()  
+    user_passenger()    
+   
+def user_modifyok():
+    a=na.get()
+    c=sp.get()
+    if a=='' or c==0:
+        messagebox.showwarning("Warning","Enter all values")
+    else:
+        cur.execute("update passenger set age={} where name='{}' and id={}".format(c,a,bookid))
+        mycon.commit()
+        messagebox.showinfo("Info","Passenger Modified")
+        umo.destroy()
+        user_passenger()
+    
+   
+def user_remove():
+    cur.execute("select id from passenger")
+    a=cur.fetchall()
+    mycon.commit()
+    for i in a:
+        ma.append(i[0])
+    if bookid not in ma:
+        messagebox.showwarning("Warning","Add a passenger to Remove")
+    else:
+        global ur
+        up.destroy()
+        ur=Tk()
+        global name2
+        ur.config(bg="papaya whip")
+        ur.geometry("1400x1050")
+        ur.title('Remove Passenger')
+        ph=PhotoImage(file=r"E:\cs proj\bg5.1.png")
+        b=Label(image=ph)
+        b.image=ph
+        b.pack()
+        name2=StringVar()
+        cur.execute("select name from passenger where id={}".format(bookid))
+        m=cur.fetchall()
+        mycon.commit()
+        Label(ur,text="Names\nAvailable",font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="gold").place(x=150,y=100)
+        l=200
+        for i in m:
+            Label(ur,text=i[0],font=("Comic Sans MS",18,"bold"),bg="misty rose",fg="gold").place(x=150,y=l)
+            l+=50
+        Label(ur,width=25,height=1,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="gold",text="Enter which name to remove").place(x=400,y=200)
+        name1_entry=Entry(ur,textvariable=name2,font=("Comic Sans MS",20,"bold"),bg="peach puff",fg="gold").place(x=900,y=200)
+        Button(ur,text="Ok",bg="misty rose",fg="gold",font=("Comic Sans MS",22,"bold"),relief=GROOVE,bd=6,activebackground="papaya whip",activeforeground="gold",command=user_removeok).place(x=700,y=270)
+        Button(ur,text="back",bg="misty rose",fg="gold",font=("Comic Sans MS",22,"bold"),relief=GROOVE,bd=6,activebackground="papaya whip",activeforeground="gold",command=userpass4).place(x=900,y=270)
+        
+def userpass4():
+    global ml
+    if ml==0:
+        ur.destroy()
+    user_passenger()
+   
+
+
+def user_removeok():
+    a=name2.get()
+    if a=='':
+        messagebox.showwarning("Warning","Enter all values")
+    else:
+        cur.execute("delete from passenger where name='{}' and id={}".format(a,bookid))
+        mycon.commit()
+        messagebox.showinfo("Info","Passenger Removed")
+        ur.destroy()
+        user_passenger()
+
+
+
+
+def user_passproceed():
+    global upp,seat1,fincost,totfare
+    cur.execute("select * from passenger where id={}".format(bookid))
+    cl=cur.fetchall()
+    seat1=cur.rowcount                
+    mycon.commit()
+    if seat1==0:
+        messagebox.showwarning("Warning","No Passengers Added")
+    else:
+        up.destroy()
+        upp=Tk()
+        upp.config(bg="papaya whip")
+        upp.geometry("1400x1050")
+        upp.title("Proceed")
+        ph=PhotoImage(file=r"E:\cs proj\bg34.1.png")
+        b=Label(image=ph)
+        b.image=ph
+        b.pack()
+        bun=busno.get()
+        Label(upp,text="Passenger(s)",font=("Comic Sans MS",22,"bold"),bg="deep sky blue",fg="CadetBlue1").place(x=20,y=20)
+        cur.execute("select name,age,seatno from passenger where id={}".format(bookid))
+        mes=cur.fetchall()
+        no=cur.rowcount
+        me=["Name","Age",'Seat']
+        a=20
+        b=80
+        for i in me:
+            Label(upp,text=i,font=("Comic Sans MS",18,"bold"),bg="deep sky blue",fg="CadetBlue1").place(x=a,y=b)
+            a+=200
+        d=140
+        for i in range(no):
+            Label(upp,text=str(mes[i][0]),font=("Comic Sans MS",20,"bold"),bg="deep sky blue",fg="CadetBlue1").place(x=20,y=d)
+            Label(upp,text=str(mes[i][1]),font=("Comic Sans MS",20,"bold"),bg="deep sky blue",fg="CadetBlue1").place(x=220,y=d)
+            Label(upp,text=str(mes[i][2]),font=("Comic Sans MS",20,"bold"),bg="deep sky blue",fg="CadetBlue1").place(x=420,y=d)
+            d+=60
+        Label(upp,font=("Comic Sans MS",20,"bold"),bg="deep sky blue",fg="CadetBlue1",text="Ticket Fare").place(x=500,y=20)
+        cur.execute("select costpp from busdetail where busno={}".format(bun))
+        ac=cur.fetchall()
+        for i in ac:
+            for j in i:
+                fincost=seat1*j
+                Label(upp,text=str(fincost),font=("Comic Sans MS",20,"bold"),bg="deep sky blue",fg="CadetBlue1").place(x=550,y=120)
+        r=fincost*(18/100)
+        totfare=fincost+r
+        Label(upp,text="Total Fare(Taxes Included)",font=("Comic Sans MS",20,"bold"),bg="deep sky blue",fg="CadetBlue1").place(x=750,y=20)
+        Label(upp,text=str(totfare),font=("Comic Sans MS",18,"bold"),bg="deep sky blue",fg="CadetBlue1").place(x=770,y=120)
+        Button(upp,width=15,text="GO Back",font=("Comic Sans MS",22,"bold"),bg="deep sky blue",fg="CadetBlue1",relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="gold",command=userpass6).place(x=300,y=d+100)
+        Button(upp,width=20,text="Proceed to Payment",font=("Comic Sans MS",22,"bold"),bg="deep sky blue",fg="CadetBlue1",relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="gold",command=trip).place(x=600,y=d+100)
+        cur.execute("select seats from busdetail where busno={}".format(bun))
+        g=cur.fetchall()
+        mycon.commit()
+        cur.execute("select * from passenger where id={}".format(bookid))
+        cu=cur.fetchall()
+        e=cur.rowcount
+        mycon.commit()
+        h=g[0][0]-e
+        cur.execute("update busdetail set seats={} where busno={}".format(h,bun))
+        mycon.commit()
+        
+def userpass6():
+    global ol
+    if ol==0:
+        upp.destroy()
+    user_passenger()
+
+
+def payopt():
+    global ol
+    if ol==0:
+        upp.destroy()
+    user_payoption()
+    
+def user_payoption():
+    global upt
+    upt=Tk()
+    upt.config(bg="lemon chiffon")
+    upt.geometry("1400x1050")
+    upt.title("Pay Option")
+    ph=PhotoImage(file=r"E:\cs proj\bg33.1.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.pack()
+    Label(upt,text="Select the mode of payment ",font=("Comic Sans MS",22,"bold"),bg="snow2",fg="salmon").place(x=300,y=100)
+    Button(upt,font=("Comic Sans MS",20,"bold"),bg="snow2",fg="salmon",text="Credit Card",relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="gold",command=user_credit).place(x=100,y=300)
+    Button(upt,font=("Comic Sans MS",20,"bold"),bg="snow2",fg="salmon",text="Debit Card",relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="gold",command=user_debit).place(x=400,y=300)
+    Button(upt,font=("Comic Sans MS",20,"bold"),bg="snow2",fg="salmon",text="Net Banking",relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="gold",command=net1).place(x=700,y=300)
+    Button(upt,font=("Comic Sans MS",20,"bold"),bg="snow2",fg="salmon",text="E-Wallet",relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="gold",command=other1).place(x=1000,y=300)
+   
+def user_credit():
+    global usc,name3,dat,code,country,cardno
+    upt.destroy()
+    usc=Tk()
+    usc.config(bg="old lace")
+    usc.geometry("1400x1050")
+    usc.title("Credit Card")
+    ph=PhotoImage(file=r"E:\cs proj\bg31.1.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.pack()
+    name3=StringVar()
+    cardno=StringVar()
+    dat=StringVar()
+    code=StringVar()
+    country=StringVar()
+    Label(usc,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="VioletRed1",text="CREDIT CARD").place(x=450,y=20)
+    name_label=Label(usc,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="VioletRed1",text="Name:").place(x=250,y=100)
+    name_entry=Entry(usc,font=("Comic Sans MS",20,"bold"),fg="SteelBlue1",bg="lavender blush",textvariable=name3).place(x=600,y=100)
+    cardno_label=Label(usc,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="VioletRed1",text=" Card Number:").place(x=250,y=180)
+    cardno_entry=Entry(usc,font=("Comic Sans MS",20,"bold"),fg="SteelBlue1",bg="lavender blush",textvariable=cardno).place(x=600,y=180)
+    expiry_label=Label(usc,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="VioletRed1",text="Expiration Date:").place(x=250,y=260)
+    expiry_entry=Entry(usc,font=("Comic Sans MS",20,"bold"),fg="SteelBlue1",bg="lavender blush",textvariable=dat).place(x=600,y=260)
+    csv_label=Label(usc,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="VioletRed1",text=" CSV Code:").place(x=250,y=340)
+    csv_entry=Entry(usc,font=("Comic Sans MS",20,"bold"),fg="SteelBlue1",bg="lavender blush",textvariable=code).place(x=600,y=340)
+    country_label=Label(usc,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="VioletRed1",text="Country:").place(x=250,y=420)
+    country_entry=Entry(usc,font=("Comic Sans MS",20,"bold"),fg="SteelBlue1",bg="lavender blush",textvariable=country).place(x=600,y=420)
+    Button(usc,text="Proceed",font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="VioletRed1",relief=GROOVE,bd=6,activebackground="lavender blush",activeforeground="SteelBlue1",command=creditok).place(x=450,y=500)
+    Button(usc,text="Back",font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="VioletRed1",relief=GROOVE,bd=6,activebackground="lavender blush",activeforeground="SteelBlue1",command=pay).place(x=650,y=500)
+
+
+def pay():
+    global ml
+    if ml==0:
+        usc.destroy()
+    user_payoption()
+   
+def creditok():
+    a=name3.get()
+    b=cardno.get()
+    c=dat.get()
+    d=code.get()
+    e=country.get()
+    if a=="" or b=='' or c=='' or d=='' or e=='':
+        messagebox.showwarning("Warning","Enter all values")
+    elif len(str(b))!=12:
+        messagebox.showwarning("Warning","Incorrect no of digits of card number")
+    elif len(str(d))!=3:
+        messagebox.showwarning("Warning","Incorrect no of digits of CSV code")
+    else:
+        pay5()
+
+
+def pay5():
+    global ml
+    if ml==0:
+        usc.destroy()
+    money()
+        
+def user_debit():
+    global udd,name4,cardno2,date2,code2
+    upt.destroy()
+    udd=Tk()
+    udd.config(bg="old lace")
+    udd.geometry("1400x1050")
+    udd.title("Debit Card")
+    ph=PhotoImage(file=r"E:\cs proj\bg31.1.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.pack()
+    name4=StringVar()
+    cardno2=StringVar()
+    date2=StringVar()
+    code2=StringVar()
+    Label(udd,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="VioletRed1",text="DEBIT CARD").place(x=450,y=20)
+    name4_label=Label(udd,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="VioletRed1",text="Name:").place(x=250,y=100)
+    name4_entry=Entry(udd,fg="SteelBlue1",font=("Comic Sans MS",20,"bold"),bg="lavender blush",textvariable=name4).place(x=600,y=100)
+    cardno2_label=Label(udd,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="VioletRed1",text="Card Number:").place(x=250,y=180)
+    cardno2_entry=Entry(udd,font=("Comic Sans MS",20,"bold"),fg="SteelBlue1",bg="lavender blush",textvariable=cardno2).place(x=600,y=180)
+    expiry_label=Label(udd,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="VioletRed1",text="expiration date:").place(x=250,y=260)
+    expiry_entry=Entry(udd,fg="SteelBlue1",font=("Comic Sans MS",20,"bold"),bg="lavender blush",textvariable=date2).place(x=600,y=260)
+    cvv_label=Label(udd,font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="VioletRed1",text="CVV Code:").place(x=250,y=340)
+    cvv_entry=Entry(udd,fg="SteelBlue1",font=("Comic Sans MS",20,"bold"),bg="lavender blush",textvariable=code2).place(x=600,y=340)
+    Button(udd,text="Proceed",font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="VioletRed1",relief=GROOVE,bd=6,activebackground="lavender blush",activeforeground="SteelBlue1",command=debitok).place(x=450,y=420)
+    Button(udd,text="Back",font=("Comic Sans MS",22,"bold"),bg="misty rose",fg="VioletRed1",relief=GROOVE,bd=6,activebackground="lavender blush",activeforeground="SteelBlue1",command=pay1).place(x=650,y=420)
+
+
+def pay1():
+    global ml
+    if ml==0:
+        udd.destroy()
+    user_payoption()
+   
+def debitok():
+    a=name4.get()
+    b=cardno2.get()
+    c=date2.get()
+    d=code2.get()
+    if a=="" or b=='' or c=='' or d=='':
+        messagebox.showwarning("Warning","Enter all values")
+    elif len(str(b))!=12:
+        messagebox.showwarning("Warning","Incorrect no of digits of card number")
+    elif len(str(d))!=3:
+        messagebox.showwarning("Warning","Incorrect no of digits of CVV code")
+    else:
+        pay6()
+
+
+def pay6():
+    global ml
+    if ml==0:
+        udd.destroy()
+    money()
+
+
+def pay2():
+    global ml
+    if ml==0:
+        nb1.destroy()
+    user_payoption()
+
+
+def net1():
+    global nb1,val
+    upt.destroy()
+    nb1=Tk()
+    nb1.geometry("1400x1050")
+    nb1.title("Net Banking")
+    val=IntVar()
+    ph=PhotoImage(file=r"E:\cs proj\bg31.1.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.pack()
+    Label(nb1,text="Select Bank",font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="VioletRed1").place(x=550,y=5)
+    Radiobutton(nb1,variable=val,value=1,text="ICICI Bank",font=("Comic Sans MS",20,"bold"),activebackground="lavender blush",activeforeground="SteelBlue1",bg="misty rose",fg="VioletRed1").place(x=400,y=50)
+    Radiobutton(nb1,variable=val,value=2,text="State Bank of India Bank",font=("Comic Sans MS",20,"bold"),activebackground="lavender blush",activeforeground="SteelBlue1",bg="misty rose",fg="VioletRed1").place(x=400,y=120)
+    Radiobutton(nb1,variable=val,value=3,text="HDFC Bank",font=("Comic Sans MS",20,"bold"),activebackground="lavender blush",activeforeground="SteelBlue1",bg="misty rose",fg="VioletRed1").place(x=400,y=190)
+    Radiobutton(nb1,variable=val,value=4,text="Indian Bank",font=("Comic Sans MS",20,"bold"),activebackground="lavender blush",activeforeground="SteelBlue1",bg="misty rose",fg="VioletRed1").place(x=400,y=260)
+    Radiobutton(nb1,variable=val,value=5,text="Axis Bank",font=("Comic Sans MS",20,"bold"),activebackground="lavender blush",activeforeground="SteelBlue1",bg="misty rose",fg="VioletRed1").place(x=400,y=340)
+    Radiobutton(nb1,variable=val,value=6,text="City Union Bank",font=("Comic Sans MS",20,"bold"),activebackground="lavender blush",activeforeground="SteelBlue1",bg="misty rose",fg="VioletRed1").place(x=400,y=410)
+    Radiobutton(nb1,variable=val,value=7,text="Bank of Baroda",font=("Comic Sans MS",20,"bold"),activebackground="lavender blush",activeforeground="SteelBlue1",bg="misty rose",fg="VioletRed1").place(x=400,y=480)
+    Button(nb1,text="OK",font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="VioletRed1",relief=GROOVE,bd=6,activebackground="lavender blush",activeforeground="SteelBlue1",command=net2).place(x=650,y=560)
+    Button(nb1,text="Back",font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="VioletRed1",relief=GROOVE,bd=6,activebackground="lavender blush",activeforeground="SteelBlue1",command=pay2).place(x=450,y=560)
+
+
+def net2():
+    global nb2
+    a=val.get()
+    if a==0:
+        messagebox.showerror("Error","No Option Selected")
+    else:
+        nb1.destroy()
+        nb2=Tk()
+        nb2.geometry("1400x1050")
+        ph=PhotoImage(file=r"E:\cs proj\bg32.1.png")
+        la=Label(image=ph)
+        la.image=ph
+        la.pack()
+        nb2.title('Net Banking 2')
+        if a==1:
+            new = 1
+            url ="https://www.icicibank.com/"
+            webbrowser.open(url,new=new)
+        elif a==2:
+            new = 1
+            url ="https://www.onlinesbi.com/"
+            webbrowser.open(url,new=new)
+        elif a==3:
+            new = 1
+            url ="https://www.hdfcbank.com/"
+            webbrowser.open(url,new=new)
+        elif a==4:
+            new = 1
+            url ="https://indianbank.in/"
+            webbrowser.open(url,new=new)
+        elif a==5:
+            new = 1
+            url ="https://www.axisbank.com//"
+            webbrowser.open(url,new=new)
+        elif a==6:
+            new = 1
+            url ="https://www.cityunionbank.com/"
+            webbrowser.open(url,new=new)
+        elif a==7:
+            new = 1
+            url ="https://www.bankofbaroda.in/"
+            webbrowser.open(url,new=new)
+        Label(nb2,text="Bank-Axis Bank",font=("Comic Sans MS",20,"bold"),bg="lemon chiffon",fg='medium sea green').place(x=300,y=150)
+        Label(nb2,text="A/c No-3457266918",font=("Comic Sans MS",20,"bold"),bg="lemon chiffon",fg='medium sea green').place(x=300,y=250)
+        Label(nb2,text="IFSC Code-AXIS0002378",font=("Comic Sans MS",20,"bold"),bg="lemon chiffon",fg='medium sea green').place(x=300,y=350)
+        Button(nb2,text="Ok",font=("Comic Sans MS",20,"bold"),command=pay4,bg="lemon chiffon",fg='medium sea green',relief=GROOVE,bd=6,activebackground="lavender blush",activeforeground="SteelBlue1").place(x=400,y=450)
+
+
+def pay4():
+    global ml
+    if ml==0:
+        nb2.destroy()
+    money()
+
+
+    
+def pay3():
+    global ml
+    if ml==0:
+        ot.destroy()
+    user_payoption()
+            
+
+
+def other1():
+    global ot,val1
+    upt.destroy()
+    ot=Tk()
+    ot.geometry("1400x1050")
+    ot.title("E-Wallet 1")
+    val1=IntVar()
+    ph=PhotoImage(file=r"E:\cs proj\bg31.1.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.pack()
+    Label(ot,text="Select Platform",font=("Comic Sans MS",20,"bold"),bg="misty rose",fg="VioletRed1").place(x=550,y=50)
+    Radiobutton(ot,variable=val1,value=1,text="Amazon Pay",font=("Comic Sans MS",20,"bold"),activebackground="misty rose",activeforeground="VioletRed1",bg="misty rose",fg="VioletRed1").place(x=400,y=110)
+    Radiobutton(ot,variable=val1,value=2,text="Google Pay",font=("Comic Sans MS",20,"bold"),activebackground="misty rose",activeforeground="VioletRed1",bg="misty rose",fg="VioletRed1").place(x=400,y=170)
+    Radiobutton(ot,variable=val1,value=3,text="Paytm",font=("Comic Sans MS",20,"bold"),activebackground="misty rose",activeforeground="VioletRed1",bg="misty rose",fg="VioletRed1").place(x=400,y=250)
+    Radiobutton(ot,variable=val1,value=4,text="Airtel Money",font=("Comic Sans MS",20,"bold"),activebackground="misty rose",activeforeground="VioletRed1",bg="misty rose",fg="VioletRed1").place(x=400,y=330)
+    Radiobutton(ot,variable=val1,value=5,text="PhonePe",font=("Comic Sans MS",20,"bold"),activebackground="misty rose",activeforeground="VioletRed1",bg="misty rose",fg="VioletRed1").place(x=400,y=410)
+    Button(ot,text="OK",font=("Comic Sans MS",20,"bold"),command=other2,bg="misty rose",fg="VioletRed1",relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1").place(x=650,y=470)
+    Button(ot,text="Back",font=("Comic Sans MS",20,"bold"),command=pay3,bg="misty rose",fg="VioletRed1",relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="SteelBlue1").place(x=450,y=470)
+
+
+def other2():
+    global ot2
+    a=val1.get()
+    if a==0:
+        messagebox.showerror("Error","No Option Selected")
+    else:
+        ot.destroy()
+        ot2=Tk()
+        ot2.geometry("1400x1050")
+        ot2.title('E-Wallet 2')
+        ph=PhotoImage(file=r"E:\cs proj\bg32.1.png")
+        la=Label(image=ph)
+        la.image=ph
+        la.pack()
+        if a==1:
+            new = 1
+            url ="https://www.amazon.in/gp/sva/dashboard?ref_=PD20_QC&pf_rd_r=4WA5CS3RDNXYQ3JE393G&pf_rd_p=ab8353ea-ac26-4c25-a8cf-6bd213425496&pd_rd_r=210fbf9c-30ab-4639-b85c-feed22de967e&pd_rd_w=Gv8kr&pd_rd_wg=PCdIn"
+            webbrowser.open(url,new=new)
+        elif a==2:
+            new = 1
+            url ="https://pay.google.com/intl/en_in/about/?gclid=EAIaIQobChMI0KLnwsWG6wIVxBwrCh0IWgegEAAYASAAEgJUEvD_BwE"
+            webbrowser.open(url,new=new)
+        elif a==3:
+            new = 1
+            url ="https://paytm.com/"
+            webbrowser.open(url,new=new)
+        elif a==4:
+            new = 1
+            url ="https://www.airtel.in/bank/mobile-prepaid?utm_source=Google&utm_content=Brand-Exact-Prepaid-Recharge&utm_medium=Search&utm_campaign=Search_Brand_Exact&cid=ps&gclid=EAIaIQobChMIhPi4kMaG6wIVwTUrCh0lXgpcEAAYASAAEgKBCvD_BwE"
+            webbrowser.open(url,new=new)
+        elif a==5:
+            new = 1
+            url ="https://www.phonepe.com/"
+            webbrowser.open(url,new=new)
+        Label(ot2,text="UPI Reference ID-32781698232",font=("Comic Sans MS",22,"bold"),bg="lemon chiffon",fg='medium sea green').place(x=200,y=300)
+        Button(ot2,text="OK",font=("Comic Sans MS",20,"bold"),command=pay6,bg="lemon chiffon",fg='medium sea green',relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1").place(x=400,y=400)
+
+
+def pay6():
+    global ml
+    if ml==0:
+        ot2.destroy()
+    money()
+
+
+def money():
+    global mon
+    mon=Tk()
+    mon.geometry("1400x1050")
+    mon.title("Money Sent")
+    ph=PhotoImage(file=r"E:\cs proj\bg29.2.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.pack()
+    Label(mon,text="Rs "+str(totfare),font=("Comic Sans MS",22,"bold")).place(x=150,y=70)
+    now=datetime.datetime.now()
+    a=now.strftime("%Y-%m-%d %H:%M:%S")
+    Label(mon,text=a,font=("Comic Sans MS",15,"bold")).place(x=150,y=140)
+    Label(mon,text="To",font=("Comic Sans MS",20,"bold")).place(x=150,y=190)
+    Label(mon,text="VIACATION" ,font=("Comic Sans MS",18,"bold")).place(x=150,y=240)
+    Label(mon,text="A/c No-3457266918",font=("Comic Sans MS",16,"bold")).place(x=150,y=300)
+    Label(mon,text="From",font=("Comic Sans MS",20,"bold")).place(x=150,y=360)
+    if tl==1:
+        k=usernam.get()
+        pw=passwor.get()
+    elif zl==2:
+        k=name.get()
+        pw=passwo.get()
+    cur.execute("select username from user where username='{}' and password='{}'".format(k,pw))
+    deta=cur.fetchall()
+    mycon.commit()
+    Label(mon,text=deta[0][0],font=("Comic Sans MS",18,"bold")).place(x=150,y=420)
+    Button(mon,text="Get Ticket",font=("Comic Sans MS",24,"bold"),command=mon1,relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1").place(x=300,y=500)
+
+
+def mon1():
+    global ml
+    if ml==0:
+        mon.destroy()
+    ticket()
+    
+  
+def main():
+    global mainscreen
+    mainscreen=Tk()
+    mainscreen.geometry("1400x1050")
+    mainscreen.title('Main Page')
+    canvas = Canvas(mainscreen)
+    scroll_y = Scrollbar(mainscreen, orient="vertical", command=canvas.yview)
+    frame = Frame(canvas)
+    ph=PhotoImage(file=r"E:\cs proj\homepage.png")
+    la=Label(frame,image=ph)
+    la.image=ph
+    la.pack()
+    Button(frame,height=1,width=15,text="LOGIN",font=("Comic Sans MS",16,"bold"),bg="dark turquoise",fg="SlateBlue2",command=login,relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1").place(x=270,y=470)
+    Button(frame,height=1,width=15,text="SIGN UP",font=("Comic Sans MS",16,"bold"),bg="dark turquoise",fg="SlateBlue2",command=register,relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1").place(x=520,y=470)
+    Button(frame,height=1,width=15,text="GUEST",font=("Comic Sans MS",16,"bold"),bg="dark turquoise",fg="SlateBlue2",command=rest,relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1").place(x=770,y=470)
+    Button(frame,height=1,width=15,text="LEARN MORE",font=("Comic Sans MS",16,"bold"),bg="dark turquoise",fg="SlateBlue2",relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1",command=ss).place(x=450,y=930)
+    Button(frame,height=1,width=15,text="LEARN MORE",font=("Comic Sans MS",16,"bold"),bg="dark turquoise",fg="SlateBlue2",relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1",command=ss1).place(x=70,y=1200)
+    Button(frame,height=1,width=15,text="LEARN MORE",font=("Comic Sans MS",16,"bold"),bg="dark turquoise",fg="SlateBlue2",relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1",command=ss2).place(x=450,y=1530)
+    Button(frame,height=1,width=15,text="LEARN MORE",font=("Comic Sans MS",16,"bold"),bg="dark turquoise",fg="SlateBlue2",relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1",command=ss3).place(x=70,y=1860)
+    canvas.create_window(0, 0, anchor='nw', window=frame)
+    canvas.update_idletasks()
+    canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
+    canvas.pack(fill='both', expand=True, side='left')
+    scroll_y.pack(fill='y', side='right')
+    menu=Menu(frame,bg="RoyalBlue3")
+    mainscreen.config(menu=menu)
+    file=Menu(menu,activebackground="royal blue",activeforeground="PaleTurquoise1",font=("Comic Sans MS",16,"bold"))
+    menu.add_cascade(label="File",menu=file,activebackground="royal blue",activeforeground="PaleTurquoise1",font=("Comic Sans MS",16,"bold"))
+    file.add_command(label="Admin",command=admin1,activebackground="royal blue",activeforeground="PaleTurquoise1",font=("Comic Sans MS",16,"bold"))
+    file.add_command(label="Help",activebackground="royal blue",activeforeground="PaleTurquoise1",font=("Comic Sans MS",16,"bold"),command=help1)
+    file.add_separator()
+
+
+def ss():
+    global ss
+    if ol==0:
+        mainscreen.destroy()
+    pic11()
+    
+def ss1():
+    global ss1
+    if ol==0:
+        mainscreen.destroy()
+    pic21()
+    
+def ss2():
+    global ss2
+    if ol==0:
+        mainscreen.destroy()
+    pic31()
+    
+def ss3():
+    global ss3
+    if ol==0:
+        mainscreen.destroy()
+    pic41()
+    
+def pic11():
+    global pic1
+    pic1=Tk()
+    pic1.geometry("1400x1050")
+    ph=PhotoImage(file=r"E:\cs proj\chennai2.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.pack()
+    Button(pic1,text="OK",font=("Comic Sans MS",15,"bold"),bg="RoyalBlue1",fg="PaleTurquoise1",command=ss4,relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1").place(x=600,y=500)
+
+
+def pic21():
+    global pic2
+    pic2=Tk()
+    pic2.geometry("1400x1050")
+    ph=PhotoImage(file=r"E:\cs proj\kodai3.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.pack()
+    Button(pic2,text="OK",font=("Comic Sans MS",15,"bold"),bg="RoyalBlue1",fg="PaleTurquoise1",command=ss5,relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1").place(x=600,y=500)
+
+
+def pic31():
+    global pic3
+    pic3=Tk()
+    pic3.geometry("1400x1050")
+    ph=PhotoImage(file=r"E:\cs proj\pondi2.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.pack()
+    Button(pic3,text="OK",font=("Comic Sans MS",15,"bold"),bg="RoyalBlue1",fg="PaleTurquoise1",command=ss6,relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1").place(x=600,y=500)    
+
+
+def pic41():
+    global pic4
+    pic4=Tk()
+    pic4.geometry("1400x1050")
+    ph=PhotoImage(file=r"E:\cs proj\madurai2.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.pack()
+    Button(pic4,text="OK",font=("Comic Sans MS",15,"bold"),command=ss7,relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1",bg="RoyalBlue1",fg="PaleTurquoise1").place(x=600,y=500)    
+
+
+def ss4():
+    global ss4
+    if ol==0:
+        pic1.destroy()
+    main()
+
+
+def ss5():
+    global ss5
+    if ol==0:
+        pic2.destroy()
+    main()
+
+
+def ss6():
+    global ss6
+    if ol==0:
+        pic3.destroy()
+    main()
+
+
+def ss7():
+    global ss7
+    if ol==0:
+        pic4.destroy()
+    main()
+    
+
+
+def admin1():
+    mainscreen.destroy()
+    admin_login()
+
+
+def login():
+    mainscreen.destroy()
+    user_login()
+
+
+def register():
+    mainscreen.destroy()
+    user_register()
+
+
+    
+def rest():
+    global ml
+    ml=1
+    if ml==1:
+        mainscreen.destroy()
+    user_mainscreen()
+   
+def ticket():
+    global ti
+    ti=Tk()
+    ti.geometry("1400x1050")
+    ti.title("Ticket")
+    canvas = Canvas(ti)
+    scroll_y = Scrollbar(ti, orient="vertical",command=canvas.yview)
+    frame=Frame(canvas)
+    ph=PhotoImage(file=r"E:\cs proj\bg23.2.png")
+    la=Label(frame,image=ph)
+    la.image=ph
+    la.pack()
+    ra=random.randint(1000,10000)
+    ran="VC-"+str(ra)
+    Label(frame,text="Invoice No",font=("Comic Sans MS",12,"bold")).place(x=20,y=150)
+    Label(frame,text=ran,font=("Comic Sans MS",12,"bold")).place(x=120,y=150)
+    now=datetime.datetime.now()
+    a=now.strftime("%Y-%m-%d %H:%M:%S")
+    da=date.get()
+    Label(frame,text="Booking date and time",font=("Comic Sans MS",12,"bold")).place(x=220,y=150)
+    Label(frame,text=a,font=("Comic Sans MS",12,"bold")).place(x=400,y=150)
+    Label(frame,text="Departure Date:",font=("Comic Sans MS",12,"bold")).place(x=600,y=150)
+    Label(frame,text=da,font=("Comic Sans MS",12,"bold")).place(x=750,y=150)
+    Label(frame,text="INVOICE",font=("Comic Sans MS",22,"bold")).place(x=950,y=150)
+    Label(frame,text="Bill To:",font=("Comic Sans MS",15,"bold")).place(x=20,y=190)
+    if tl==1:
+        k=usernam.get()
+        pw=passwor.get()
+    elif zl==2:
+        k=name.get()
+        pw=passwo.get()
+    cur.execute("select username,email,aadhar from user where username='{}' and password='{}'".format(k,pw))
+    deta=cur.fetchall()
+    mycon.commit()
+    des=deta[0][0]+"\n"+deta[0][1]+"\n"+str(deta[0][2])
+    Label(frame,font=("Comic Sans MS",15,"bold"),text=des).place(x=20,y=240)
+    Label(frame,text="Passenger(s)",font=("Comic Sans MS",15,"bold")).place(x=500,y=190)
+    cur.execute("select name,age,seatno from passenger where id={}".format(bookid))
+    mes=cur.fetchall()
+    no=cur.rowcount
+    b=230
+    Label(frame,text='Name',font=("Comic Sans MS",15,"bold")).place(x=500,y=b)
+    Label(frame,text='Age',font=("Comic Sans MS",15,"bold")).place(x=650,y=b)
+    Label(frame,text='Seat',font=("Comic Sans MS",15,"bold")).place(x=750,y=b)
+    c=500
+    d=280
+    for i in range(no):
+        Label(frame,text=str(mes[i][0]),font=("Comic Sans MS",13,"bold")).place(x=500,y=d)
+        Label(frame,text=str(mes[i][1]),font=("Comic Sans MS",13,"bold")).place(x=650,y=d)
+        Label(frame,text=str(mes[i][2]),font=("Comic Sans MS",13,"bold")).place(x=750,y=d)
+        d+=40
+    su=["Bus No","Type1","Type2","Mode","From","To","Timing"]
+    e=20
+    f=d+50
+    for j in su:
+        Label(frame,text=j,font=("Comic Sans MS",14,"bold")).place(x=e,y=f)
+        e+=150
+    g=busno.get()
+    cur.execute("select busno,type1,type2,mode,froloc,toloc,timing,costpp from busdetail where busno={}".format(g))
+    m=cur.fetchall()
+    n=cur.rowcount
+    mycon.commit()
+    k=d+100
+    for i in range(n):
+        Label(frame,text=str(m[i][0]),font=("Comic Sans MS",14,"bold")).place(x=20,y=k)
+        Label(frame,text=str(m[i][1]),font=("Comic Sans MS",14,"bold")).place(x=170,y=k)
+        Label(frame,text=str(m[i][2]),font=("Comic Sans MS",14,"bold")).place(x=320,y=k)
+        Label(frame,text=str(m[i][3]),font=("Comic Sans MS",14,"bold")).place(x=470,y=k)
+        Label(frame,text=str(m[i][4]),font=("Comic Sans MS",14,"bold")).place(x=620,y=k)
+        Label(frame,text=str(m[i][5]),font=("Comic Sans MS",14,"bold")).place(x=770,y=k)
+        Label(frame,text=str(m[i][6]),font=("Comic Sans MS",14,"bold")).place(x=920,y=k)
+        k+=60
+    Label(frame,text="Ticket Fare",font=("Comic Sans MS",15,"bold")).place(x=20,y=d+160)
+    Label(frame,text=str(fincost),font=("Comic Sans MS",15,"bold")).place(x=150,y=d+160)
+    Label(frame,text="Tax(Including GST,Service Tax,etc)-18%",font=("Comic Sans MS",15,"bold")).place(x=20,y=d+210)
+    r=fincost*(18/100)
+    t=fincost+r
+    Label(frame,text=str(r),font=("Comic Sans MS",15,"bold")).place(x=450,y=d+210)
+    Label(frame,text="Total Fare",font=("Comic Sans MS",15,"bold")).place(x=20,y=d+260)
+    Label(frame,text=str(t),font=("Comic Sans MS",15,"bold")).place(x=150,y=d+260)
+    Label(frame,text="Health Facilities\nMask,Sanitizer,Emergency First Aid kit,\n fire extingiusher, frequent sanitization of all surfaces,\n other hygiene supplies , break glass system",font=("Comic Sans MS",12,"bold")).place(x=650,y=d+300)
+    Label(frame,text="Other Facilities\nWifi,safe and on time bus,Music system,\n TV, Water bottles, Blankets, Charging ports, Large leg room,\n frequent stops for restroom and other necessities, adjustable seats,\nGPS tracking,overhead light and AC",font=("Comic Sans MS",12,"bold")).place(x=650,y=d+160)
+    Label(frame,text="Booking Id",font=("Comic Sans MS",15,"bold")).place(x=250,y=d+260)
+    Label(frame,text=bookid,font=("Comic Sans MS",15,"bold")).place(x=400,y=d+260)
+    Button(frame,text="OK",font=("Comic Sans MS",15,"bold"),bg='PaleGreen',relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1",command=tic1).place(x=1100,y=d+80)
+    canvas.create_window(0, 0, anchor='nw', window=frame)
+    canvas.update_idletasks()
+    canvas.configure(scrollregion=canvas.bbox('all'), yscrollcommand=scroll_y.set)
+    canvas.pack(fill='both', expand=True, side='left')
+    scroll_y.pack(fill='y', side='right')
+
+
+def tic1():
+    global ol
+    if ol==0:
+        ti.destroy()
+    user_mainscreen()
+    
+def loc():
+    new = 1
+    url ='https://www.google.com/maps/place/Besant+Nagar,+Chennai,+Tamil+Nadu/@12.9982298,80.2594824,15z/data=!3m1!4b1!4m5!3m4!1s0x3a5267fadf0cdca9:0x54228587f3eb3efd!8m2!3d13.0002927!4d80.2666982'
+    webbrowser.open(url,new=new)
+
+
+def help1():
+    global hel,nam,phno,email2,sub
+    mainscreen.destroy()
+    hel=Tk()
+    hel.geometry("1400x1050")
+    hel.title("HELP")
+    ph=PhotoImage(file=r"E:\cs proj\bg47.2.png")
+    la=Label(image=ph)
+    la.image=ph
+    la.place(x=1,y=1)
+    nam=StringVar()
+    phno=IntVar()
+    email2=StringVar()
+    sub=StringVar()
+    mess=StringVar()
+    Label(hel,text='Contact Us',font=("Comic Sans MS",22,"bold"),bg='DarkSeaGreen1',fg='VioletRed1').place(x=350,y=15)
+    Label(hel,text='Name',font=("Comic Sans MS",20,"bold"),bg='DarkSeaGreen1',fg='VioletRed1').place(x=80,y=70)
+    Entry(hel,textvariable=nam,font=("Comic Sans MS",20,"bold"),fg="SteelBlue1",bg="lavender blush").place(x=80,y=120)
+    Label(hel,text='Phone No',font=("Comic Sans MS",20,"bold"),bg='DarkSeaGreen1',fg='VioletRed1').place(x=530,y=70)
+    Entry(hel,textvariable=phno,font=("Comic Sans MS",20,"bold"),fg="SteelBlue1",bg="lavender blush").place(x=530,y=120)
+    Label(hel,text='Email',font=("Comic Sans MS",20,"bold"),bg='DarkSeaGreen1',fg='VioletRed1').place(x=80,y=180)
+    Entry(hel,textvariable=email2,font=("Comic Sans MS",20,"bold"),fg="SteelBlue1",bg="lavender blush").place(x=80,y=220)
+    Label(hel,text='Subject',font=("Comic Sans MS",20,"bold"),bg='DarkSeaGreen1',fg='VioletRed1').place(x=530,y=180)
+    Entry(hel,textvariable=sub,font=("Comic Sans MS",20,"bold"),fg="SteelBlue1",bg="lavender blush").place(x=530,y=220)
+    Label(hel,text='Query',font=("Comic Sans MS",20,"bold"),bg='DarkSeaGreen1',fg='VioletRed1').place(x=80,y=280)
+    Text(hel,font=("Comic Sans MS",20,"bold"),height=4,width=45,fg="SteelBlue1",bg="lavender blush").place(x=80,y=340)
+    Button(hel,text="Send",command=help2,font=("Comic Sans MS",22,"bold"),bg='DarkSeaGreen1',fg='VioletRed1',relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1").place(x=600,y=540)
+    Button(hel,text="Location",command=loc,font=("Comic Sans MS",12,"bold"),bg='DarkSeaGreen1',fg='VioletRed1',relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1").place(x=980,y=315)
+    Button(hel,text="Back",command=help3,font=("Comic Sans MS",22,"bold"),bg='DarkSeaGreen1',fg='VioletRed1',relief=GROOVE,bd=6,activebackground="misty rose",activeforeground="VioletRed1").place(x=450,y=540)
+
+
+def help3():
+    hel.destroy()
+    main()
+
+
+def help2():
+    a=nam.get()
+    b=phno.get()
+    c=email2.get()
+    d=sub.get()
+    if a=='' or b==0 or c=='' or d=='':
+        messagebox.showwarning("Warning","Enter all values")
+    else:
+        messagebox.showinfo("Sent","Thank you for Sharing, Your query will be solved soon")
+        hel.destroy()
+        main()
+    
+main()
+mainscreen.mainloop()
